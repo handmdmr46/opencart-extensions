@@ -1,0 +1,1 @@
+Custom extensions and classes designed for opencart users who want to be able to manage there products on eBay as well. This will allow bulk imports, product stock and inventory management and much more.

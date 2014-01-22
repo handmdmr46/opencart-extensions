@@ -198,8 +198,8 @@ class ControllerCommonHeader extends Controller {
 			$this->data['affiliate_sale'] = $this->url->link('affiliate/sale', 'token=' . $this->session->data['token'], 'SSL');
 
 			// csv_import
-			$this->data['csv_import'] = $this->url->link('extras/csv_import', 'token=' . $this->session->data['token'], 'SSL');
-			$this->data['ebayid_import'] = $this->url->link('extras/ebayid_import', 'token=' . $this->session->data['token'], 'SSL');
+			$this->data['csv_import'] = $this->url->link('affiliate/csv_import', 'token=' . $this->session->data['token'], 'SSL');
+			$this->data['ebayid_import'] = $this->url->link('affiliate/ebayid_import', 'token=' . $this->session->data['token'], 'SSL');
 
 
 			$this->data['stores'] = array();

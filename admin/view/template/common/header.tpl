@@ -166,6 +166,7 @@ $(document).ready(function(){
           <li><a href="<?php echo $affiliate_sale; ?>"><?php echo $text_affiliate_sale; ?></a></li>
         </ul>
       </li>
+      <!-- Consider using vqmod to initiate plugin -->
       <li id="csv-import"><a class="top"><?php echo $text_csv_import; ?></a>
         <ul>
           <li><a href="<?php echo $csv_import; ?>"><?php echo $text_import_csv; ?></a></li>

@@ -18,16 +18,10 @@
   <?php } ?>
 
   <div class="box">
-<?php
-/*echo '<h2>Linked</h2>';
-print_r($test);
-echo '<h2>Unlinked</h2>';
-print_r($test2);*/
-// echo $test . '<br>' . $test2;
-?>
+
     <div class="heading">
-      <h1><img src="catalog/view/theme/childtheme/affiliate_image/download.png" alt="" /> <?php echo $heading_title; ?></h1>
-      <h1 class="wait" style="margin-left:1700px; display: none;">Please Wait, this may take awhile..... &nbsp;<img src="catalog/view/theme/childtheme/affiliate_image/ajax_load.gif" alt="" /></h1>
+      <h1><img src="view/image/download.png" alt="" /> <?php echo $heading_title; ?></h1>
+      <h1 class="wait" style="margin-left:1700px; display: none;">Please Wait, this may take awhile..... &nbsp;<img src="view/image/loading.gif" alt="" width="20" height="20" /></h1>
       <div class="buttons">
         <a onclick="start_import(); $('#form').attr('action', '<?php echo $import_ids; ?>'); $('#form').submit();" class="button"><?php echo $button_import; ?></a>
         <a onclick="$('#form').attr('action', '<?php echo $load_profile; ?>'); $('#form').submit();" class="button"><?php echo $button_load_profile; ?></a>
@@ -147,7 +141,7 @@ print_r($test2);*/
   <div class="box">
 
     <div class="heading">
-      <h1><img src="admin/view/image/review.png" alt="" /> <?php echo $text_start_dates; ?></h1>
+      <h1><img src="view/image/review.png" alt="" /> <?php echo $text_start_dates; ?></h1>
       <div class="buttons">
         <a href="<?php echo $clear_dates; ?>" class="button"><?php echo $button_clear_dates; ?></a>
         <a href="<?php echo $reload; ?>" class="button"><?php echo $button_reload; ?></a>
@@ -172,10 +166,11 @@ print_r($test2);*/
   <div class="box">
 
     <div class="heading">
-      <h1><img src="admin/view/image/product.png" alt="" /> <?php echo $text_product_links; ?></h1>
+      <h1><img src="view/image/product.png" alt="" /> <?php echo $text_product_links; ?></h1>
       <div class="buttons">
         <a onclick="$('#form').attr('action', '<?php echo $edit_linked_products; ?>'); $('#form').submit();" class="button"><?php echo $button_edit_linked_products; ?></a>
         <a onclick="$('#form').attr('action', '<?php echo $edit_unlinked_products; ?>'); $('#form').submit();" class="button"><?php echo $button_edit_unlinked_products; ?></a>
+        <a onclick="$('#form').attr('action', '<?php echo $activate_linked_products; ?>'); $('#form').submit();" class="button"><?php echo $button_activate_linked_products; ?></a>
         <a href="<?php echo $reload; ?>" class="button"><?php echo $button_reload; ?></a>
       </div>
     </div>

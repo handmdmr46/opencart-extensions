@@ -545,7 +545,7 @@ class ModelAffiliateCsvImport extends Model {
 
 		$sql = "SELECT   pd.name,
  					 	 pd.product_id
-			    FROM     oc_product_description pd
+			    FROM     " . DB_PREFIX . "product_description pd
 				WHERE    pd.product_id IN (
 										   SELECT product_id p
                    					   	   FROM   " . DB_PREFIX . "product p

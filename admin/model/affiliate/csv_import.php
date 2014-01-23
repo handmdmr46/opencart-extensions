@@ -135,7 +135,8 @@ class ModelAffiliateCsvImport extends Model {
 								`stock_status_id` = '5',
 								`tax_class_id` = '9',
 								`date_added` = NOW(),
-								`affiliate_id` = '0'");
+								`affiliate_id` = '0',
+								`csv_import` = '1'");
 
 
 		$product_id = $this->db->getLastId();
@@ -189,7 +190,7 @@ class ModelAffiliateCsvImport extends Model {
 	}
 
 	public  function getTotalUnlinkedProducts() {
-		$query = $this->db->query("SELECT `product_id` FROM " . DB_PREFIX . "product WHERE `status` = '0' AND `affiliate_id` = '0'");
+		$query = $this->db->query("SELECT `product_id` FROM " . DB_PREFIX . "product WHERE `status` = '0' AND `affiliate_id` = '0' AND `csv_import` = '1'");
 
 		$pids = array();
 
@@ -204,7 +205,12 @@ class ModelAffiliateCsvImport extends Model {
 	}
 
 	public  function getTotalLinkedProducts() {
-		$count = $this->db->query("SELECT COUNT(*) AS `total` FROM " . DB_PREFIX . "affiliate_product_link WHERE `affiliate_id` = '0'");
+		//bikesalvage
+		$count = $this->db->query("SELECT COUNT(*) AS `total` FROM " . DB_PREFIX . "ebay_listing WHERE `active` = '0'");
+
+		// affiliates
+		/*$count = $this->db->query("SELECT COUNT(*) AS `total` FROM " . DB_PREFIX . "affiliate_product_link WHERE `affiliate_id` = '0' AND `active` = '0'");*/
+
 		return $count->row['total'];
 	}
 
@@ -235,6 +241,7 @@ class ModelAffiliateCsvImport extends Model {
 			    							FROM   " . DB_PREFIX . "product p
 			    							WHERE  p.status = '0'
 			    							AND    p.affiliate_id = '0'
+			    							AND    p.csv_import = '1'
 			    							)";
 
 	    if(isset($start) || isset($limit)) {
@@ -430,7 +437,8 @@ class ModelAffiliateCsvImport extends Model {
 		 		FROM      " . DB_PREFIX . "product p
 		 		LEFT JOIN " . DB_PREFIX . "product_description pd ON (p.product_id = pd.product_id)
 		 		WHERE     p.status = '0'
-		 		AND       p.affiliate_id = '0'";
+		 		AND       p.affiliate_id = '0'
+		 		AND       p.csv_import = '1'";
 
 		$query = $this->db->query($sql);
 
@@ -447,17 +455,22 @@ class ModelAffiliateCsvImport extends Model {
 	public  function addProductLink($data) {
 
 		foreach ($data as $product_id => $ebay_id) {
-			$this->db->query("INSERT IGNORE INTO " . DB_PREFIX . "affiliate_product_link
+			// bikesalvage
+			$this->db->query("INSERT IGNORE INTO " . DB_PREFIX . "ebay_listing
+							  SET 				 `ebay_item_id` = '" . $this->db->escape($ebay_id) . "',
+							  					 `product_id` = '" . $this->db->escape($product_id) . "',
+							  					 `active` = '0'");
+
+			$this->db->query("UPDATE " . DB_PREFIX . "product
+							  SET    csv_import = '0'
+							  WHERE  product_id = '" . $this->db->escape($product_id) . "'");
+
+			// for affiliates
+			/*$this->db->query("INSERT IGNORE INTO " . DB_PREFIX . "affiliate_product_link
 							  SET                `product_id` = '" . $this->db->escape($product_id). "',
 							  			         `ebay_item_id` = '" . $this->db->escape($ebay_id) . "',
 							  			         `affiliate_id` = '0',
-							  			         `active` = '0'");
-
-			// for bikesalvage.com
-			/*$this->db->query("INSERT IGNORE INTO " . DB_PREFIX . "ebay_listing
-							  SET 				 `ebay_item_id` = '" . $this->db->escape($ebay_id) . "'
-							  					 `product_id` = '" . $this->db->query($product_id) . "'
-							  					 `active` = '0'");*/
+							  			         `active` = '0'");*/
 
 		}
 
@@ -465,24 +478,42 @@ class ModelAffiliateCsvImport extends Model {
 
 	public function activateLinkedProducts() {
 
-		$this->db->query("UPDATE  " . DB_PREFIX . "affiliate_product_link
-						  SET     `active` = '1'
-						  WHERE   `active` = '0'");
-
-		// for bikesalvage.com
-		/*$this->db->query("UPDATE  " . DB_PREFIX . "ebay_listing
+		$this->db->query("UPDATE " . DB_PREFIX . "product p
+						  SET    p.status = '1'
+						  WHERE  p.product_id IN (
+						  						  SELECT pl.product_id
+						  						  FROM   " . DB_PREFIX . "affiliate_product_link pl
+						  						  WHERE  pl.active = '1'
+						  						  )
+					    ");
+		// affiliates
+		/*$this->db->query("UPDATE  " . DB_PREFIX . "affiliate_product_link
 						  SET     `active` = '1'
 						  WHERE   `active` = '0'");*/
+
+		// for bikesalvage.com
+		$this->db->query("UPDATE  " . DB_PREFIX . "ebay_listing
+						  SET     `active` = '1'
+						  WHERE   `active` = '0'");
 	}
 
 	public  function getLinkedProducts($start, $limit) {
-		$sql = "SELECT    apl.product_id,
+		// bikesalvage
+		$sql = "SELECT    el.product_id,
+	  			  		  el.ebay_item_id,
+          		  		  pd.name
+				FROM      " . DB_PREFIX . "ebay_listing el
+				LEFT JOIN " . DB_PREFIX . "product_description pd ON (el.product_id = pd.product_id)
+				WHERE     el.active = '0'";
+
+		// affiliates
+		/*$sql = "SELECT    apl.product_id,
 	  			  		  apl.ebay_item_id,
           		  		  pd.name
 				FROM      " . DB_PREFIX . "affiliate_product_link apl
 				LEFT JOIN " . DB_PREFIX . "product_description pd ON (apl.product_id = pd.product_id)
 				WHERE     apl.affiliate_id = '0'
-				AND 	  apl.active = '0'";
+				AND 	  apl.active = '0'";*/
 
 		if(isset($start) || isset($limit)) {
 				if($start < 0) {
@@ -520,6 +551,7 @@ class ModelAffiliateCsvImport extends Model {
                    					   	   FROM   " . DB_PREFIX . "product p
                    					   	   WHERE  p.status = '0'
                    					   	   AND    p.affiliate_id = '0'
+                   					   	   AND 	  p.csv_import = '1'
                    					   	   )
 				ORDER BY pd.name DESC";
 

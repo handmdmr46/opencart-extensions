@@ -213,8 +213,9 @@
               <?php } ?>
             </tbody>
           </table>
-        <div class="pagination"><?php echo $pagination_linked; ?></div>
+
       </div><!-- #linked -->
+
 
       <div id="unlinked">
           <table class="list" cellpadding="2">
@@ -248,10 +249,20 @@
               <?php } ?>
             </tbody>
           </table>
-        <div class="pagination"><?php echo $pagination_unlinked; ?></div>
+
       </div><!-- #unlinked -->
+
+
     </form>
     </div><!-- .content -->
+    <!-- NOTE: these paginations are backwards here but display correclty on the site -->
+    <h2><?php echo $text_unlinked_product_pagination; ?></h2>
+    <div class="pagination"><?php echo $pagination_linked; ?></div>
+
+    <h2><?php echo $text_linked_product_pagination; ?></h2>
+    <div class="pagination"><?php echo $pagination_unlinked; ?></div>
+
+
   </div><!-- .box -->
 
 </div><!-- #content -->

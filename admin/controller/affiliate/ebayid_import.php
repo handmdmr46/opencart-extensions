@@ -65,6 +65,8 @@ class ControllerAffiliateEbayidImport extends Controller {
 		$this->data['text_product_title']              = $this->language->get('text_product_title');
 		$this->data['text_product_id']                 = $this->language->get('text_product_id');
 		$this->data['text_ebay_item_id']               = $this->language->get('text_ebay_item_id');
+		$this->data['text_linked_product_pagination'] = $this->language->get('text_linked_product_pagination');
+		$this->data['text_unlinked_product_pagination'] = $this->language->get('text_unlinked_product_pagination');
 
 	    // Error
 	    if (isset($this->session->data['error'])) {
@@ -146,7 +148,7 @@ class ControllerAffiliateEbayidImport extends Controller {
 	      $url .= '&page=' . $this->request->get['page'];
 	    }
 
-	    $limit = 40;
+	    $limit = 100;
 	    $start = ($page - 1) * $limit;
 
 	    // Buttons

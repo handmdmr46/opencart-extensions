@@ -1,29 +1,37 @@
-
+DROP TABLE IF EXISTS `db_product_to_affiliate`;
 CREATE TABLE `db_product_to_affiliate` (
   `affiliate_id` int(11) NOT NULL,
   `product_id` int(11) NOT NULL,
   PRIMARY KEY (`affiliate_id`,`product_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
+
+DROP TABLE IF EXISTS `db_customer_to_customergroup`;
 CREATE TABLE  `db_customer_to_customergroup` (
   `customer_id` int(11) NOT NULL,
   `customer_group_id` int(11) NOT NULL,
   PRIMARY KEY (`customer_group_id`,`customer_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
+
+DROP TABLE IF EXISTS `db_affiliate_order`;
 CREATE TABLE `db_affiliate_order` (
-	`order_id` int(11) NOT NULL,
-	`affiliate_id` int(11) NOT NULL,
-	PRIMARY KEY (`order_id`,`affiliate_id`)
+  `order_id` int(11) NOT NULL,
+  `affiliate_id` int(11) NOT NULL,
+  PRIMARY KEY (`order_id`,`affiliate_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
+
+DROP TABLE IF EXISTS `db_affiliate_to_email`;
 CREATE TABLE `db_affiliate_to_email` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `email` varchar(96) NOT NULL,
-  `affiliate_id` = int(11) NOT NULL,
+  `affiliate_id` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;
 
+
+DROP TABLE IF EXISTS `db_affiliate_product_link`;
 CREATE TABLE `db_affiliate_product_link` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `affiliate_id` int(11) NOT NULL,
@@ -34,6 +42,8 @@ CREATE TABLE `db_affiliate_product_link` (
   UNIQUE KEY `product_id` (`product_id`,`ebay_item_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;
 
+
+DROP TABLE IF EXISTS `db_ebay_import_startdates`;
 CREATE TABLE `db_ebay_import_startdates` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `start_date` varchar(64) NOT NULL,
@@ -43,6 +53,8 @@ CREATE TABLE `db_ebay_import_startdates` (
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;
 
+
+DROP TABLE IF EXISTS `db_ebay_settings`;
 CREATE TABLE `db_ebay_settings` (
   `compat` int(11) NOT NULL,
   `user_token` text NOT NULL,
@@ -55,13 +67,25 @@ CREATE TABLE `db_ebay_settings` (
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;
 
+
+DROP TABLE IF EXISTS `db_ebay_compatibility`;
 CREATE TABLE `db_ebay_compatibility` (
   `level` int(11) NOT NULL,
   `id` int(11) NOT NULL AUTO_INCREMENT,
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;
 
-INSERT INTO `oc_ebay_compatibility` (`level`, `id`) VALUES
+
+DROP TABLE IF EXISTS `db_ebay_site_ids`;
+CREATE TABLE `db_ebay_site_ids` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `site_id` int(11) NOT NULL,
+  `site_name` varchar(64) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `site_id` (`site_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;
+
+INSERT INTO `db_ebay_compatibility` (`level`, `id`) VALUES
 (851, 1),
 (849, 2),
 (847, 3),
@@ -89,15 +113,7 @@ INSERT INTO `oc_ebay_compatibility` (`level`, `id`) VALUES
 (803, 25),
 (801, 26);
 
-CREATE TABLE `db_ebay_site_ids` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `site_id` int(11) NOT NULL,
-  `site_name` varchar(64) NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `site_id` (`site_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;
-
-INSERT INTO `oc_ebay_site_ids` (`id`, `site_id`, `site_name`) VALUES
+INSERT INTO `db_ebay_site_ids` (`id`, `site_id`, `site_name`) VALUES
 (1, 0, 'United States'),
 (2, 100, 'eBay Motors'),
 (3, 101, 'Italy'),
@@ -137,14 +153,12 @@ AFTER       `store_id`;
 
 ALTER TABLE `db_product`
 ADD COLUMN  `affiliate_id` int(11) NOT NULL DEFAULT'0',
-ADD COLUMN  `affiliate_order` int(11) NOT NULL DEFAULT'0';
-
-ALTER TABLE  `db_order`
-ADD COLUMN   `affiliate_order` int(11) NOT NULL DEFAULT'0';
+ADD COLUMN  `affiliate_order` int(11) NOT NULL DEFAULT'0',
+ADD COLUMN  `csv_import` int(11) NOT NULL DEFAULT'0';
 
 ALTER TABLE `db_order`
-MODIFY      `affiliate_order` int(11) NOT NULL DEFAULT'0'
-AFTER		    `affiliate_id`;
+ADD COLUMN  `affiliate_order` int(11) NOT NULL DEFAULT'0'
+AFTER       `affiliate_id`;
 
 ALTER TABLE `db_order_product`
 ADD COLUMN  `affiliate_id` int(11) NOT NULL DEFAULT'0';
@@ -181,32 +195,6 @@ ALTER TABLE `db_category`
 ADD COLUMN  `manufacturer_id` int(11) NOT NULL DEFAULT'0'
 AFTER       `category_id`;
 
-
-/* add intersecting table for this?? what?? not sure what i ment here?? */
-/*ALTER TABLE `db_affiliate`
-ADD COLUMN  `email2` varchar(96) NULL
-AFTER       `email`;
-
-ALTER TABLE `db_affiliate`
-ADD COLUMN  `email3` varchar(96) NULL
-AFTER       `email2`;*/
-
-ALTER TABLE `db_product`
-ADD COLUMN  `csv_import` int(11) NOT NULL DEFAULT'0'
-AFTER       `affiliate_id`;
-
 ALTER TABLE `db_ebay_listing`
 ADD COLUMN  `active` int(11) NOT NULL DEFAULT'1'
 AFTER       `status`;
-
-
-
-
-
--- reset auto increment value --
--- ALTER TABLE tablename AUTO_INCREMENT = value; --
--- OR --
--- TRUNCATE TABLE --
-
-
-

@@ -285,10 +285,9 @@ class ModelAffiliateCsvImport extends Model {
 		}
 
 		return $product_data;
-
 	}
 
-    public function editList($product_id, $edit_data) {
+    public function editCsvImportProductInfo($product_id, $edit_data) {
        // product
 		if (isset($edit_data['price'])  || isset($edit_data['quantity'])     || isset($edit_data['model'])  ||
 			isset($edit_data['weight']) || isset($edit_data['lenght'])       || isset($edit_data['width'])  ||
@@ -404,7 +403,7 @@ class ModelAffiliateCsvImport extends Model {
 									  `affiliate_id` = '0'");
 	}
 
-	public function addEbayImportStartDates($data) {
+	public function setEbayImportStartDates($data) {
 		$today = date("F j, Y, g:i a");
 		$this->db->query("INSERT INTO " . DB_PREFIX . "ebay_import_startdates
 						  SET		  `start_date` = '" . $this->db->escape($data['start_date']) . "',
@@ -419,7 +418,7 @@ class ModelAffiliateCsvImport extends Model {
 		return json_encode($query->rows);
 	}
 
-	public function clearDates() {
+	public function deleteEbayImportStartDates() {
 		$this->db->query("DELETE FROM " . DB_PREFIX . "ebay_import_startdates WHERE `affiliate_id` = '0'");
 
 		// for tab
@@ -452,7 +451,7 @@ class ModelAffiliateCsvImport extends Model {
 		return $product_data;
 	}
 
-	public  function addProductLink($data) {
+	public  function addEbayListingProductLink($data) {
 
 		foreach ($data as $product_id => $ebay_id) {
 			// bikesalvage
@@ -473,7 +472,6 @@ class ModelAffiliateCsvImport extends Model {
 							  			         `active` = '0'");*/
 
 		}
-
 	}
 
 	public function activateLinkedProducts() {
@@ -578,7 +576,6 @@ class ModelAffiliateCsvImport extends Model {
 		}
 
 		return $product_data;
-
 	}
 
 	public  function editLinkedProducts($product_id, $ebay_id) {
@@ -589,7 +586,6 @@ class ModelAffiliateCsvImport extends Model {
 							  	  `ebay_item_id` = '" . $this->db->escape($ebay_id) . "',
 							  	  `affiliate_id` = '0'");
 		}
-
 	}
 
 	public  function editUnlinkedProducts($product_id, $ebay_id) {
@@ -601,7 +597,6 @@ class ModelAffiliateCsvImport extends Model {
 
 			$this->db->query("UPDATE " . DB_PREFIX . "product SET `status` = '1'");
 		}
-
 	}
 
 }

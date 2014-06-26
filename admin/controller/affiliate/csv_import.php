@@ -611,7 +611,7 @@ class ControllerAffiliateCsvImport extends Controller {
 					'gallery_images' => $gallery_images
 				  );
 
-				  $this->model_affiliate_csv_import->editList($product_id, $edit_data);
+				  $this->model_affiliate_csv_import->editCsvImportProductInfo($product_id, $edit_data);
 			}
 
 			$this->session->data['success_edit'] = $this->language->get('success_edit');

@@ -239,7 +239,7 @@ class ControllerAffiliateEbayidImport extends Controller {
 
 	    if ($this->request->server['REQUEST_METHOD'] == 'POST' && $this->validateImport()) {
 
-	      $this->model_affiliate_csv_import->addEbayImportStartDates($this->request->post);
+	      $this->model_affiliate_csv_import->setEbayImportStartDates($this->request->post);
 
 	      $call_name = 'GetSellerList';
 
@@ -369,7 +369,7 @@ class ControllerAffiliateEbayidImport extends Controller {
 	        }
 	      }
 	      $data = array_combine($product_id,$ebay_id); //array_combine($keys,$values)
-	      $this->model_affiliate_csv_import->addProductLink($data);
+	      $this->model_affiliate_csv_import->addEbayListingProductLink($data);
 	      $this->session->data['success'] = $this->language->get('success_import');
 	      $this->redirect($this->url->link('affiliate/ebayid_import', 'token=' . $this->session->data['token'], 'SSL'));
 	      $this->response->setOutput(json_encode($json));
@@ -471,7 +471,7 @@ class ControllerAffiliateEbayidImport extends Controller {
 		$this->document->setTitle($this->language->get('heading_title_ebayid_import'));
 		$this->load->model('affiliate/csv_import');
 
-	    $this->model_affiliate_csv_import->clearDates();
+	    $this->model_affiliate_csv_import->deleteEbayImportStartDates();
 
 	    $this->session->data['success'] = $this->language->get('success_clear_dates');
 

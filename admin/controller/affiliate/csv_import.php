@@ -623,7 +623,7 @@ class ControllerAffiliateCsvImport extends Controller {
   	}
 
   	public function delete() {
-		$this->language->load('affiliate/dashboard');
+		$this->language->load('affiliate/csv_import');
 		$this->load->model('affiliate/csv_import');
 		$this->document->setTitle($this->language->get('heading_title_import_csv'));
 

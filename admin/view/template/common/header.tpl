@@ -171,10 +171,7 @@ $(document).ready(function(){
         <ul>
           <li><a href="<?php echo $csv_import; ?>"><?php echo $text_import_csv; ?></a></li>
           <li><a href="<?php echo $ebayid_import; ?>"><?php echo $text_import_ebayid; ?></a></li>
-<<<<<<< HEAD
           <li><a href="<?php echo $stock_control; ?>"><?php echo $text_stock_control; ?></a></li>
-=======
->>>>>>> 3e1bafd31f194cd49d6207bab2a608aeaec66736
         </ul>
       </li>
       <li id="reports"><a class="top"><?php echo $text_reports; ?></a>

@@ -461,15 +461,15 @@ class ControllerAffiliateCsvImport extends Controller {
 						  $this->data['csv'][$key]['description'] = str_replace('No hassle returns.','',$this->data['csv'][$key]['description']);
 
 						  // Match model code
-						  /*if(isset($this->request->post['search_models'])) {
+						  // if(isset($this->request->post['search_models'])) {
 						  	$model_matcher = '/([0-9]{6,7}\s?\D[0-9]{1,2})/i';
 						  	preg_match($model_matcher,$this->data['csv'][$key]['description'],$model);
 						  	$this->data['csv'][$key]['model'] = $model[1];
-						  }*/
+						  // }
 
 
 						  // Remove model from description
-						  // $this->data['csv'][$key]['description'] = preg_replace($model_matcher,'',$this->data['csv'][$key]['description']);
+						  $this->data['csv'][$key]['description'] = preg_replace($model_matcher,'',$this->data['csv'][$key]['description']);
 
 						  // Domestic shipping
 						  if($this->data['csv'][$key]['shipping_dom'] == 'USPSPriorityFlatRateEnvelope'){
@@ -623,7 +623,7 @@ class ControllerAffiliateCsvImport extends Controller {
   	}
 
   	public function delete() {
-		$this->language->load('affiliate/dashboard');
+		$this->language->load('affiliate/csv_import');
 		$this->load->model('affiliate/csv_import');
 		$this->document->setTitle($this->language->get('heading_title_import_csv'));
 

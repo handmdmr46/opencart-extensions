@@ -176,7 +176,7 @@ class ModelAffiliateCsvImport extends Model {
 	}
 
 	public function getTotalCsvImportProducts() {
-	    $query = $this->db->query("SELECT `product_id` FROM " . DB_PREFIX . "product WHERE `status` = '0' AND `affiliate_id` = '0'");
+	    $query = $this->db->query("SELECT `product_id` FROM " . DB_PREFIX . "product WHERE `status` = '0' AND `affiliate_id` = '0' AND `csv_import` = '1'");
 
 		$pids = array();
 		foreach($query->rows as $result) {
@@ -430,6 +430,9 @@ class ModelAffiliateCsvImport extends Model {
 		return $query->rows;
 	}
 
+	/**
+	* @return (array) - productID & name 
+	*/
 	public  function getCsvImportProducts() {
 		$sql = "SELECT    p.product_id,
 						  pd.name

@@ -8,7 +8,7 @@ class ControllerAffiliateCsvImport extends Controller {
 		$this->import();
 	}
 
-	public function import() {
+	protected function import() {
 		// Breadcrumbs
   		$this->data['breadcrumbs'] = array();
 

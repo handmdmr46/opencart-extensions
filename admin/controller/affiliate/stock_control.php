@@ -4,7 +4,7 @@ class ControllerAffiliateStockControl extends Controller {
 		$this->language->load('affiliate/stock_control');
 		$this->document->setTitle($this->language->get('heading_title_stock_control'));
 		$this->load->model('affiliate/csv_import');
-		$this->load->model('affiliate/stock_control');
+		// $this->load->model('affiliate/stock_control');
 		
 		// addScript and addStyle examples
 		/*
@@ -34,7 +34,11 @@ class ControllerAffiliateStockControl extends Controller {
 		);
 
 		// Language
-		$this->data['heading_title']                   = $this->language->get('heading_title_stock_control');
+		$this->data['heading_title']       = $this->language->get('heading_title_stock_control');
+		$this->data['button_ebay_call']    = $this->language->get('button_ebay_call');
+		$this->data['button_load_profile'] = $this->language->get('button_load_profile');
+		$this->data['button_edit_profile'] = $this->language->get('button_edit_profile');
+		$this->data['button_cancel']       = $this->language->get('button_cancel');
 		// $this->data['']                   = $this->language->get('');
 
 		// Error
@@ -54,7 +58,7 @@ class ControllerAffiliateStockControl extends Controller {
 	    }
 
 	    // Page, Start & Limit -- pagination --
-	    /*if (isset($this->request->get['page'])) {
+	    if (isset($this->request->get['page'])) {
 	      $page = $this->request->get['page'];
 	      $this->data['page'] = $this->request->get['page'];
 	    } else {
@@ -69,10 +73,12 @@ class ControllerAffiliateStockControl extends Controller {
 	    }
 
 	    $limit = 100;
-	    $start = ($page - 1) * $limit;*/
+	    $start = ($page - 1) * $limit;
 
 		// Buttons
-	    $this->data['import_ids'] = $this->url->link('affiliate/ebayid_import/importIds', 'token=' . $this->session->data['token'] . $url, 'SSL');
+	    $this->data['import_ids'] = $this->url->link('affiliate/stock_control/ebayCall', 'token=' . $this->session->data['token'] . $url, 'SSL');
+	    $this->data['load_profile'] = $this->url->link('affiliate/stock_control/loadProfile', 'token=' . $this->session->data['token'] . $url, 'SSL');
+	    $this->data['cancel'] = $this->url->link('common/home', 'token=' . $this->session->data['token'] . $url, 'SSL');
 
 		// Load Template for View
 		$this->template = 'affiliate/stock_control.tpl';

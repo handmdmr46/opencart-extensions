@@ -1,6 +1,13 @@
 <?php
 
 $_['heading_title_stock_control']			=	'Stock Control';
+$_['button_edit_profile']			=	'Edit Profile';
+$_['button_load_profile']			=	'Load Profile';
+$_['button_ebay_call']			=	'eBay Call';
+$_['button_cancel']				=	'Cancel';
+
+
+
 // $_['']			=	'';
 // $_['']			=	'';
 // $_['']			=	'';

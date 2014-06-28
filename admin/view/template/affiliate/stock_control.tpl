@@ -21,9 +21,9 @@
             <h1><img src="view/image/download.png" alt="" /> <?php echo $heading_title; ?></h1>
             <h1 class="wait" style="margin-left:1700px; display: none;">Please Wait, this may take awhile..... &nbsp;<img src="view/image/loading.gif" alt="" width="20" height="20" /></h1>
             <div class="buttons">
-              <a onclick="start_ebay_call(); $('#form').attr('action', '<?php echo $import_ids; ?>'); $('#form').submit();" class="button"><?php echo $button_import; ?></a>
+              <a onclick="start_ebay_call(); $('#form').attr('action', '<?php echo $ebay_call; ?>'); $('#form').submit();" class="button"><?php echo $button_ebay_call; ?></a>
               <a onclick="$('#form').attr('action', '<?php echo $load_profile; ?>'); $('#form').submit();" class="button"><?php echo $button_load_profile; ?></a>
-              <a onclick="$('#form').attr('action', '<?php echo $update_profile; ?>'); $('#form').submit();" class="button"><?php echo $button_update_profile; ?></a>
+              <a onclick="$('#form').attr('action', '<?php echo $edit_profile; ?>'); $('#form').submit();" class="button"><?php echo $button_edit_profile; ?></a>
               <a href="<?php echo $cancel; ?>" class="button"><?php echo $button_cancel; ?></a>
             </div>
         </div><!-- .heading -->

@@ -203,6 +203,7 @@ class ControllerAffiliateEbayidImport extends Controller {
 	      $this->data['site_id'] = '';
 	    }
 
+	    // Pagination
 	    $pagination_linked        = new Pagination();
 	    $pagination_linked->total = $linked_total;
 	    $pagination_linked->page  = $page;

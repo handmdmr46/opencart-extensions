@@ -602,4 +602,6 @@ class ModelAffiliateCsvImport extends Model {
 		}
 	}
 
-}
+
+} // end class
+

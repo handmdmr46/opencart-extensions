@@ -461,18 +461,6 @@ class ControllerAffiliateCsvImport extends Controller {
 						  $this->data['csv'][$key]['description'] = str_replace('No hassle returns.','',$this->data['csv'][$key]['description']);
 
 						  // Match model code
-<<<<<<< HEAD
-						  // if(isset($this->request->post['search_models'])) {
-						  	$model_matcher = '/([0-9]{6,7}\s?\D[0-9]{1,2})/i';
-						  	preg_match($model_matcher,$this->data['csv'][$key]['description'],$model);
-						  	$this->data['csv'][$key]['model'] = $model[1];
-						  // }
-
-
-						  // Remove model from description
-						  $this->data['csv'][$key]['description'] = preg_replace($model_matcher,'',$this->data['csv'][$key]['description']);
-
-=======
 						  /*if(isset($this->request->post['search_models'])) {
 						  	$model_matcher = '/([0-9]{6,7}\s?\D[0-9]{1,2})/i';
 						  	preg_match($model_matcher,$this->data['csv'][$key]['description'],$model);
@@ -487,7 +475,6 @@ class ControllerAffiliateCsvImport extends Controller {
 						  $this->data['csv'][$key]['model'] = $model[1];
 						  $this->data['csv'][$key]['description'] = preg_replace($model_matcher,'',$this->data['csv'][$key]['description']);
 						  
->>>>>>> 3e1bafd31f194cd49d6207bab2a608aeaec66736
 						  // Domestic shipping
 						  if($this->data['csv'][$key]['shipping_dom'] == 'USPSPriorityFlatRateEnvelope'){
 							  $this->data['csv'][$key]['shipping_dom'] = 4;

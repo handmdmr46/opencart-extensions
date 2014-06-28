@@ -679,8 +679,5 @@ class ControllerAffiliateCsvImport extends Controller {
 		}
 	}
 
-<<<<<<< HEAD
+
 }// end class
-=======
-}// end class
->>>>>>> 3e1bafd31f194cd49d6207bab2a608aeaec66736

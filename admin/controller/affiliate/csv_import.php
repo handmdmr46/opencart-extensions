@@ -466,11 +466,15 @@ class ControllerAffiliateCsvImport extends Controller {
 						  	preg_match($model_matcher,$this->data['csv'][$key]['description'],$model);
 						  	$this->data['csv'][$key]['model'] = $model[1];
 						  }*/
-
-
+						  
 						  // Remove model from description
 						  // $this->data['csv'][$key]['description'] = preg_replace($model_matcher,'',$this->data['csv'][$key]['description']);
 
+						  $model_matcher = '/([0-9]{6,7}\s?\D[0-9]{1,2})/i';
+						  preg_match($model_matcher,$this->data['csv'][$key]['description'],$model);
+						  $this->data['csv'][$key]['model'] = $model[1];
+						  $this->data['csv'][$key]['description'] = preg_replace($model_matcher,'',$this->data['csv'][$key]['description']);
+						  
 						  // Domestic shipping
 						  if($this->data['csv'][$key]['shipping_dom'] == 'USPSPriorityFlatRateEnvelope'){
 							  $this->data['csv'][$key]['shipping_dom'] = 4;

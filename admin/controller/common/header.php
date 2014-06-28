@@ -115,10 +115,7 @@ class ControllerCommonHeader extends Controller {
 		$this->data['text_csv_import'] = $this->language->get('text_csv_import');
 		$this->data['text_import_ebayid'] = $this->language->get('text_import_ebayid');
 		$this->data['text_import_csv'] = $this->language->get('text_import_csv');
-<<<<<<< HEAD
 		$this->data['text_stock_control'] = $this->language->get('text_stock_control');
-=======
->>>>>>> 3e1bafd31f194cd49d6207bab2a608aeaec66736
 
 
 		// Logged || Logout user message above search field
@@ -204,10 +201,7 @@ class ControllerCommonHeader extends Controller {
 			// csv_import
 			$this->data['csv_import'] = $this->url->link('affiliate/csv_import', 'token=' . $this->session->data['token'], 'SSL');
 			$this->data['ebayid_import'] = $this->url->link('affiliate/ebayid_import', 'token=' . $this->session->data['token'], 'SSL');
-<<<<<<< HEAD
 			$this->data['stock_control'] = $this->url->link('affiliate/stock_control', 'token=' . $this->session->data['token'], 'SSL');
-=======
->>>>>>> 3e1bafd31f194cd49d6207bab2a608aeaec66736
 
 
 			$this->data['stores'] = array();

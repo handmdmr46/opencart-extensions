@@ -94,10 +94,7 @@ $_['text_affiliate_sale']              = 'Sales';
 $_['text_csv_import']                  = 'CSV Import';
 $_['text_import_csv']                  = 'Import CSV - step 1';
 $_['text_import_ebayid']               = 'Import Ebayid - step 2';
-<<<<<<< HEAD
 $_['text_stock_control']               = 'Stock Control';
-=======
->>>>>>> 3e1bafd31f194cd49d6207bab2a608aeaec66736
 
 
 //$_['']                               = '';

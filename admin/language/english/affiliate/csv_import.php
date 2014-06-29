@@ -74,6 +74,7 @@ $_['button_edit_list']                 = 'Edit';
 $_['button_activate_linked_products']  = 'Activate Product Links';
 
 // error
+$_['error']							   = 'ERROR: There was an error in your request, please try again';
 $_['error_file']                       = 'ERROR: Incorrect file type, parser only works with Turbolister Exported CSV files.';
 $_['error_validation']                 = 'ERROR: There was a problem parsing your csv file, the title fields do not match. Please make sure the CSV file is a Turbolister export in FileExchange format. If problem\'s persist contact the site administrator.';
 $_['error_delete']                     = 'ERROR: There was a problem deleting the selected product, please try again. If problem\'s persist contact the site administrator.';

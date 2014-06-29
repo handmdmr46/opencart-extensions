@@ -498,20 +498,24 @@ class ControllerAffiliateEbayidImport extends Controller {
 
 	    if ((utf8_strlen($this->request->post['user_token']) < 1) || (utf8_strlen($this->request->post['user_token']) > 872)) {
 	        $this->session->data['error_user_token'] = $this->language->get('error_user_token');
+	        $this->session->data['error'] = $this->language->get('error');
 	        $true = 0;
 	    }
 
 	    if ((utf8_strlen($this->request->post['developer_id']) < 1) || (utf8_strlen($this->request->post['developer_id']) > 36)) {
 	        $this->session->data['error_developer_id'] = $this->language->get('error_developer_id');
+	        $this->session->data['error'] = $this->language->get('error');
 	    }
 
 	    if ((utf8_strlen($this->request->post['certification_id']) < 1) || (utf8_strlen($this->request->post['certification_id']) > 36)) {
 	        $this->session->data['error_certification_id'] = $this->language->get('error_certification_id');
+	        $this->session->data['error'] = $this->language->get('error');
 	        $true = 0;
 	    }
 
 	    if ((utf8_strlen($this->request->post['application_id']) < 1) || (utf8_strlen($this->request->post['application_id']) > 36)) {
 	        $this->session->data['error_application_id'] = $this->language->get('error_application_id');
+	        $this->session->data['error'] = $this->language->get('error');
 	        $true = 0;
 	    }
 

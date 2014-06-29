@@ -21,18 +21,92 @@
             <h1><img src="view/image/download.png" alt="" /> <?php echo $heading_title; ?></h1>
             <h1 class="wait" style="margin-left:1700px; display: none;">Please Wait, this may take awhile..... &nbsp;<img src="view/image/loading.gif" alt="" width="20" height="20" /></h1>
             <div class="buttons">
-              <a onclick="start_ebay_call(); $('#form').attr('action', '<?php echo $ebay_call; ?>'); $('#form').submit();" class="button"><?php echo $button_ebay_call; ?></a>
-              <a onclick="$('#form').attr('action', '<?php echo $load_profile; ?>'); $('#form').submit();" class="button"><?php echo $button_load_profile; ?></a>
-              <a onclick="$('#form').attr('action', '<?php echo $edit_profile; ?>'); $('#form').submit();" class="button"><?php echo $button_edit_profile; ?></a>
+              <a onclick="$('#form').attr('action', '<?php echo $ebay_call; ?>'); $('#form').submit(); start_ebay_call();" class="button"><?php echo $button_ebay_call; ?></a>
+              <a onclick="$('#form').attr('action', '<?php echo $set_ebay_profile; ?>'); $('#form').submit();" class="button"><?php echo $button_set_ebay_profile; ?></a>
               <a href="<?php echo $cancel; ?>" class="button"><?php echo $button_cancel; ?></a>
             </div>
         </div><!-- .heading -->
 
         <div class="content">
         	<form action="" method="post" enctype="multipart/form-data" id="form">
-        	<table class="form">
-        	</table>
-        	</form>
+		      <table class="form">
+		        <tr>
+		          <td><span class="required">* </span><?php echo $text_ebay_user_token; ?></td>
+		          <td>
+		            <input name="user_token" value="<?php echo $user_token; ?>" type="text" size="100" required>
+		            <?php if ($error_user_token) { ?>
+		            <span class="error"><?php echo $error_user_token; ?></span>
+		            <?php } ?>
+		          </td>
+		          <td></td>
+        		</tr>
+        		<tr>
+		          <td><span class="required">* </span><?php echo $text_developer_id; ?></td>
+		          <td>
+		            <input name="developer_id" value="<?php echo $developer_id; ?>" type="text" size="100" required>
+		            <?php if ($error_developer_id) { ?>
+		            <span class="error"><?php echo $error_developer_id; ?></span>
+		            <?php } ?>
+		          </td>
+		          <td></td>
+		        </tr>
+		        <tr>
+		          <td><span class="required">* </span><?php echo $text_application_id; ?></td>
+		          <td>
+		            <input name="application_id" value="<?php echo $application_id; ?>" type="text" size="100" required>
+		            <?php if ($error_application_id) { ?>
+		            <span class="error"><?php echo $error_application_id; ?></span>
+		            <?php } ?>
+		          </td>
+		          <td></td>
+		        </tr>
+		        <tr>
+		          <td><span class="required">* </span><?php echo $text_certification_id; ?></td>
+		          <td>
+		            <input name="certification_id" value="<?php echo $certification_id; ?>" type="text" size="100" required>
+		            <?php if ($error_certification_id) { ?>
+		            <span class="error"><?php echo $error_certification_id; ?></span>
+		            <?php } ?>
+		          </td>
+		          <td></td>
+		        </tr>
+		        <tr>
+		          <td><span class="required">* </span><?php echo $text_site_id; ?></td>
+		          <td>
+		            <select name="site_id">
+		            <option value="0"><?php echo $text_select; ?></option>
+		            <?php foreach($ebay_sites as $site) { ?>
+		            <?php if (isset($site_id) && $site_id == $site['site_id'] ) { ?>
+		            <option value="<?php echo $site['site_id']; ?>" selected><?php echo $site['site_name']; ?></option>
+		            <?php } else { ?>
+		            <option value="<?php echo $site['site_id']; ?>"><?php echo $site['site_name']; ?></option>
+		            <?php } ?>
+		            <?php } ?>
+		            </select>
+		            <?php if ($error_site_id) { ?>
+		            <span class="error"><?php echo $error_site_id; ?></span>
+		            <?php } ?>
+		          </td>
+		        </tr>
+		        <tr>
+		          <td><span class="required">* </span><?php echo $text_compat_level; ?><span class="help"><?php echo $text_compat_help; ?></span></td>
+		          <td>
+		            <select name="compatability_level">
+		            <option value="0"><?php echo $text_select; ?></option>
+		            <?php foreach ($compat_levels as $level) { ?>
+		            <?php if (isset($compat) && $compat == $level['level'] ) { ?>
+		            <option value="<?php echo $level['level']; ?>" selected><?php echo $level['level']; ?></option>		            
+		            <?php } else { ?>
+		            <option value="<?php echo $level['level']; ?>"><?php echo $level['level']; ?></option>
+		            <?php } ?>
+		            <?php } ?>
+		            </select>
+		          </td>
+		          <td></td>
+		          <td></td>
+		        </tr>
+		      </table>
+		    </form>
         </div><!-- .content -->
 
     </div><!-- .box -->

@@ -1,7 +1,13 @@
 <?php echo $header; ?>
 
 <div id="content">
+<?php
 
+// for($i=2; $i <= 20; $i++) {
+// 	echo $i . "<br>";
+// }
+
+?>
 	<div class="breadcrumb">
 	  <?php foreach ($breadcrumbs as $breadcrumb) { ?>
 	    <?php echo $breadcrumb['separator']; ?><a href="<?php echo $breadcrumb['href']; ?>"><?php echo $breadcrumb['text']; ?></a>
@@ -17,11 +23,11 @@
     <?php } ?>
 
     <div class="box">
+
         <div class="heading">
-            <h1><img src="view/image/download.png" alt="" /> <?php echo $heading_title; ?></h1>
+            <h1><img src="view/image/download.png" alt="" /> <?php echo $heading_title_ebay_profile; ?></h1>
             <h1 class="wait" style="margin-left:1700px; display: none;">Please Wait, this may take awhile..... &nbsp;<img src="view/image/loading.gif" alt="" width="20" height="20" /></h1>
-            <div class="buttons">
-              <a onclick="$('#form').attr('action', '<?php echo $ebay_call; ?>'); $('#form').submit(); start_ebay_call();" class="button"><?php echo $button_ebay_call; ?></a>
+            <div class="buttons">      
               <a onclick="$('#form').attr('action', '<?php echo $set_ebay_profile; ?>'); $('#form').submit();" class="button"><?php echo $button_set_ebay_profile; ?></a>
               <a href="<?php echo $cancel; ?>" class="button"><?php echo $button_cancel; ?></a>
             </div>
@@ -74,14 +80,14 @@
 		          <td><span class="required">* </span><?php echo $text_site_id; ?></td>
 		          <td>
 		            <select name="site_id">
-		            <option value="0"><?php echo $text_select; ?></option>
-		            <?php foreach($ebay_sites as $site) { ?>
-		            <?php if (isset($site_id) && $site_id == $site['site_id'] ) { ?>
-		            <option value="<?php echo $site['site_id']; ?>" selected><?php echo $site['site_name']; ?></option>
-		            <?php } else { ?>
-		            <option value="<?php echo $site['site_id']; ?>"><?php echo $site['site_name']; ?></option>
-		            <?php } ?>
-		            <?php } ?>
+			            <option value="999"><?php echo $text_select; ?></option>
+			            <?php foreach($ebay_sites as $site) { ?>
+				            <?php if (isset($site_id) && $site_id == $site['site_id'] ) { ?>
+				            	<option value="<?php echo $site['site_id']; ?>" selected><?php echo $site['site_name']; ?></option>
+				            <?php } else { ?>
+				            	<option value="<?php echo $site['site_id']; ?>"><?php echo $site['site_name']; ?></option>
+				            <?php } ?>
+			            <?php } ?>
 		            </select>
 		            <?php if ($error_site_id) { ?>
 		            <span class="error"><?php echo $error_site_id; ?></span>
@@ -92,7 +98,7 @@
 		          <td><span class="required">* </span><?php echo $text_compat_level; ?><span class="help"><?php echo $text_compat_help; ?></span></td>
 		          <td>
 		            <select name="compatability_level">
-		            <option value="0"><?php echo $text_select; ?></option>
+		            <option value="999"><?php echo $text_select; ?></option>
 		            <?php foreach ($compat_levels as $level) { ?>
 		            <?php if (isset($compat) && $compat == $level['level'] ) { ?>
 		            <option value="<?php echo $level['level']; ?>" selected><?php echo $level['level']; ?></option>		            
@@ -101,26 +107,100 @@
 		            <?php } ?>
 		            <?php } ?>
 		            </select>
+		            <?php if ($error_compatability_level) { ?>
+		            <span class="error"><?php echo $error_compatability_level; ?></span>
+		            <?php } ?>
 		          </td>
 		          <td></td>
 		          <td></td>
 		        </tr>
 		      </table>
-		    </form>
         </div><!-- .content -->
 
     </div><!-- .box -->
+    <div class="box">
 
-	
+        <div class="heading">
+            <h1><img src="view/image/download.png" alt="" /> <?php echo $heading_title_ebay_call; ?></h1>
+            <h1 class="wait2" style="margin-left:1700px; display: none;">Please Wait, this may take awhile..... &nbsp;<img src="view/image/loading.gif" alt="" width="20" height="20" /></h1>
+            <div class="buttons">
+              <a onclick="$('#form').attr('action', '<?php echo $ebay_call; ?>'); $('#form').submit(); startProgressBar2();" class="button"><?php echo $button_ebay_call; ?></a>
+              <a href="<?php echo $cancel; ?>" class="button"><?php echo $button_cancel; ?></a>
+            </div>
+        </div><!-- .heading -->
+
+        <div class="content">        	
+		      <table class="form">
+		        <tr>
+		          <td><span class="required">* </span><?php echo $text_ebay_call_name; ?></td>
+		          <td>
+		            <select name="ebay_call_name">
+			            <option value="999"><?php echo $text_select; ?></option>
+			            <?php foreach($ebay_call_names as $call) { ?>
+			            	<option value="<?php echo $call; ?>"><?php echo $call; ?></option>
+			            <?php } ?>
+		            </select>
+		            <?php if ($error_ebay_call_name) { ?>
+		            <span class="error"><?php echo $error_ebay_call_name; ?></span>
+		            <?php } ?>
+		          </td>
+		        </tr>
+		        <tr>
+		          <td><?php echo $text_item_id; ?></td>
+		          <td>
+		            <input name="item_id" value="<?php echo $item_id; ?>" type="text" size="100" required>		           
+		          </td>
+		          <td></td>
+		        </tr>
+		        
+		        <?php if ($getOrders) { ?>
+		        	<tr><td style="width:500px;">
+		 			<?php 
+		 				$ebay_item_id = array();
+		 				$purchase_qty 	 = array();
+			 			foreach(array_combine($getOrders['id'], $getOrders['qty_purchased']) as $item_id => $qty) { 
+			 				$ebay_item_id[] = $item_id;
+			 				$purchase_qty[] = $qty;
+			 			}
+			 			$data = array_combine($ebay_item_id,$purchase_qty);
+			 			foreach($data as $k => $v) {
+			 				echo 'ItemID: ' . $k . ' QuantityPurchased: ' . $v . '<br>';
+			 			}
+		 			 ?>
+		 			 </td></tr>
+		        <?php } ?>
+
+		        <?php if ($getItem) { ?>
+		        	<tr><td style="width:500px;">
+		        	<?php 
+		        		foreach($getItem as $item) { 
+		        			echo $item . '<br>';
+		        		}
+		        		echo $getItemTitle;
+		        		echo $getItemId;
+		        		echo $getItemQuantity;
+
+		        	?>
+		        	</td></tr>
+				<?php } ?>		      
+		      </table>
+		  </form>
+        </div><!-- .content -->
+
+    </div><!-- .box -->
 
 </div><!-- #content -->
 
 <script type="text/javascript"><!--
 
-  function start_ebay_call(){
+  function startProgressBar(){
     $('.wait').show();
     // dont need this timer because resets when page re-loads.
     // setTimeout(function(){$('.wait').hide();}, 999000);
+  }
+
+  function startProgressBar2(){
+    $('.wait2').show();
   }
 
   function check(id) {

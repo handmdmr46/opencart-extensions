@@ -60,6 +60,7 @@ $_['text_unlinked_product_pagination'] = 'Unlinked Products Pagination';
 $_['text_linked_product_pagination']   = 'Linked Products Pagination';
 
 
+
 // buttons
 $_['button_import']                    = 'Import';
 $_['button_cancel']                    = 'Cancel';

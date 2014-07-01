@@ -95,6 +95,8 @@ $_['text_csv_import']                  = 'CSV Import';
 $_['text_import_csv']                  = 'Import CSV - step 1';
 $_['text_import_ebayid']               = 'Import Ebayid - step 2';
 $_['text_stock_control']               = 'Stock Control';
+$_['text_linked_products']             = 'Linked Products';
+$_['text_unlinked_products']           = 'Unlinked Products';
 
 //$_['']                               = '';
 

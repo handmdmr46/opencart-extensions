@@ -33,5 +33,10 @@ class ModelAffiliateStockControl extends Model {
 		return $query->rows;
 	}
 
+	public function getEbayCallNames() {
+		$call_names = array('getOrders', 'getItem', 'endFixedPriceItem', 'reviseInventoryStatus');
+		return $call_names;
+	}
+
 } // end class
 ?>

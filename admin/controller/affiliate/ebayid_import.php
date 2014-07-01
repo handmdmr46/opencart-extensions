@@ -243,6 +243,8 @@ class ControllerAffiliateEbayidImport extends Controller {
 	      $this->model_affiliate_csv_import->setEbayImportStartDates($this->request->post);
 
 	      $call_name = 'GetSellerList';
+	      // $array = array("foo", "bar", "hello", "world");
+
 
 	      $ebay_call = new Ebaycall($this->request->post['developer_id'], $this->request->post['application_id'], $this->request->post['certification_id'], $this->request->post['compatability_level'], $this->request->post['site_id'], $call_name);
 
@@ -304,8 +306,8 @@ class ControllerAffiliateEbayidImport extends Controller {
 	        $import_data['id'][] = $item_id->nodeValue;
 	      }
 
-	      $this->data['number_pages'] = intval($number_pages->item(0)->nodeValue);
-	      $this->data['number_entries'] = intval($number_entries->item(0)->nodeValue);
+	      // $this->data['number_pages'] = intval($number_pages->item(0)->nodeValue);
+	      // $this->data['number_entries'] = intval($number_entries->item(0)->nodeValue);
 	      $page_count = intval($number_pages->item(0)->nodeValue);
 	      $total_entries = intval($number_entries->item(0)->nodeValue);
 
@@ -349,10 +351,7 @@ class ControllerAffiliateEbayidImport extends Controller {
 	          foreach ($item_ids as $item_id) {
 	            $import_data['id'][] = $item_id->nodeValue;
 	          }
-
-	          $i++;
 	        }
-
 	      }
 
 	      $match      = 0;
@@ -373,7 +372,7 @@ class ControllerAffiliateEbayidImport extends Controller {
 	      $this->model_affiliate_csv_import->addEbayListingProductLink($data);
 	      $this->session->data['success'] = $this->language->get('success_import');
 	      $this->redirect($this->url->link('affiliate/ebayid_import', 'token=' . $this->session->data['token'], 'SSL'));
-	      $this->response->setOutput(json_encode($json));
+	      // $this->response->setOutput(json_encode($json));
 	    }
 	    $this->getForm();
 

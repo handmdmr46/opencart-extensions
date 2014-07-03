@@ -197,5 +197,5 @@ ADD COLUMN  `manufacturer_id` int(11) NOT NULL DEFAULT'0'
 AFTER       `category_id`;
 
 ALTER TABLE `db_ebay_listing`
-ADD COLUMN  `active` int(11) NOT NULL DEFAULT'1'
+ADD COLUMN  `affiliate_id` int(11) NOT NULL DEFAULT'0'
 AFTER       `status`;

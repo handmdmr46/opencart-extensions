@@ -24,8 +24,7 @@
       <h1 class="wait" style="margin-left:1700px; display: none;">Please Wait, this may take awhile..... &nbsp;<img src="view/image/loading.gif" alt="" width="20" height="20" /></h1>
       <div class="buttons">
         <a onclick="start_import(); $('#form').attr('action', '<?php echo $import_ids; ?>'); $('#form').submit();" class="button"><?php echo $button_import; ?></a>
-        <a onclick="$('#form').attr('action', '<?php echo $load_profile; ?>'); $('#form').submit();" class="button"><?php echo $button_load_profile; ?></a>
-        <a onclick="$('#form').attr('action', '<?php echo $update_profile; ?>'); $('#form').submit();" class="button"><?php echo $button_update_profile; ?></a>
+        <a onclick="$('#form').attr('action', '<?php echo $set_ebay_profile; ?>'); $('#form').submit();" class="button"><?php echo $button_set_ebay_profile; ?></a>
         <a href="<?php echo $cancel; ?>" class="button"><?php echo $button_cancel; ?></a>
       </div>
     </div><!-- .heading -->
@@ -128,12 +127,15 @@
             <?php } ?>
             <?php } ?>
             </select>
+            <?php if ($error_compatability_level) { ?>
+                <span class="error"><?php echo $error_compatability_level; ?></span>
+            <?php } ?>
           </td>
           <td></td>
           <td></td>
         </tr>
       </table>
-    <!-- </form> -->
+    </form>
     </div><!-- .content -->
 
   </div><!-- .box -->
@@ -161,111 +163,6 @@
       </div>
     </div><!-- .content -->
   </div><!-- .box -->
-
-
-  <div class="box">
-
-    <div class="heading">
-      <h1><img src="view/image/product.png" alt="" /> <?php echo $text_product_links; ?></h1>
-      <div class="buttons">
-        <a onclick="$('#form').attr('action', '<?php echo $edit_linked_products; ?>'); $('#form').submit();" class="button"><?php echo $button_edit_linked_products; ?></a>
-        <a onclick="$('#form').attr('action', '<?php echo $edit_unlinked_products; ?>'); $('#form').submit();" class="button"><?php echo $button_edit_unlinked_products; ?></a>
-        <a onclick="$('#form').attr('action', '<?php echo $activate_linked_products; ?>'); $('#form').submit();" class="button"><?php echo $button_activate_linked_products; ?></a>
-        <a href="<?php echo $reload; ?>" class="button"><?php echo $button_reload; ?></a>
-      </div>
-    </div>
-
-    <div class="content">
-
-      <div id="tabs" class="htabs">
-        <a href="#linked"><?php echo $text_linked_products; ?></a>
-        <a href="#unlinked"><?php echo $text_unlinked_products; ?></a>
-      </div>
-
-      <div id="linked">
-          <table class="list" cellpadding="2">
-            <thead>
-                <tr>
-                  <td width="1" class="center">
-                     <input type="checkbox" onclick="$('input[name*=\'selected\']').attr('checked', this.checked);" />
-                  </td>
-                  <td class="left width200"><?php echo $text_ebay_item_id; ?></td>
-                  <td class="center width75"><?php echo $text_product_id; ?></td>
-                  <td><?php echo $text_product_title; ?></td>
-                </tr>
-            </thead>
-            <tbody>
-              <?php if($linked_products) { ?>
-              <?php foreach($linked_products as $product) { ?>
-              <tr>
-                <td width="1" class="center">
-                    <?php if ($product['selected']) { ?>
-                      <input type="checkbox" name="selected[]" id="<?php echo $product['product_id']; ?>_select" value="<?php echo $product['product_id']; ?>" checked="checked">
-                    <?php } else { ?>
-                      <input type="checkbox" name="selected[]" id="<?php echo $product['product_id']; ?>_select" value="<?php echo $product['product_id']; ?>">
-                    <?php } ?>
-                </td>
-                <td class="left width200"><input type="text" name="<?php echo $product['product_id']; ?>_ebay_item_id" value="<?php echo $product['ebay_item_id']; ?>" size="80" onclick="check(<?php echo $product['product_id']; ?>)"></td>
-                <td class="center width75"><?php echo $product['product_id']; ?></td>
-                <td><?php echo $product['title']; ?></td>
-              </tr>
-              <?php } ?>
-              <?php } ?>
-            </tbody>
-          </table>
-
-      </div><!-- #linked -->
-
-
-      <div id="unlinked">
-          <table class="list" cellpadding="2">
-            <thead>
-                <tr>
-                    <td width="1" class="center">
-                       <input type="checkbox" onclick="$('input[name*=\'selected\']').attr('checked', this.checked);" />
-                    </td>
-                    <td class="left width200"><?php echo $text_ebay_item_id; ?></td>
-                    <td class="center width75"><?php echo $text_product_id; ?></td>
-                    <td><?php echo $text_product_title; ?></td>
-
-                </tr>
-            </thead>
-            <tbody>
-              <?php if($unlinked_products) { ?>
-              <?php foreach($unlinked_products as $product) { ?>
-              <tr>
-                <td width="1" class="center">
-                    <?php if ($product['selected']) { ?>
-                      <input type="checkbox" name="selected[]" id="<?php echo $product['product_id']; ?>_select" value="<?php echo $product['product_id']; ?>" checked="checked">
-                    <?php } else { ?>
-                      <input type="checkbox" name="selected[]" id="<?php echo $product['product_id']; ?>_select" value="<?php echo $product['product_id']; ?>">
-                    <?php } ?>
-                </td>
-                <td class="left width200"><input type="text" name="<?php echo $product['product_id']; ?>_ebay_item_id" value="" size="80" onclick="check(<?php echo $product['product_id']; ?>)"></td>
-                <td class="center width75"><?php echo $product['product_id']; ?></td>
-                <td><?php echo $product['title']; ?></td>
-              </tr>
-              <?php } ?>
-              <?php } ?>
-            </tbody>
-          </table>
-
-      </div><!-- #unlinked -->
-
-
-    </form>
-    </div><!-- .content -->
-    <!-- NOTE: these paginations are backwards here but display correclty on the site -->
-    <h2><?php echo $text_unlinked_product_pagination; ?></h2>
-    <div class="pagination"><?php echo $pagination_linked; ?></div>
-
-    <h2><?php echo $text_linked_product_pagination; ?></h2>
-    <div class="pagination"><?php echo $pagination_unlinked; ?></div>
-
-
-  </div><!-- .box -->
-
-</div><!-- #content -->
 
 </div><!-- #container -->
 

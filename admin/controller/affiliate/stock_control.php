@@ -228,7 +228,6 @@ class ControllerAffiliateStockControl extends Controller {
 	    );
 
 	    $this->response->setOutput($this->render());
-
 	}
 
 	public function ebayCall() {
@@ -290,10 +289,14 @@ class ControllerAffiliateStockControl extends Controller {
 
 	        $doc_response = new DomDocument();
 	        $doc_response->loadXML($xml_response);
-	        $message = $doc_response->getElementsByTagName('Ack');
+	        $message = $doc_response->getElementsByTagName('Ack')->item(0)->nodeValue;
+	        $severity_code = $doc_response->getElementsByTagName('SeverityCode')->item(0)->nodeValue;
+	        $error_code = $doc_response->getElementsByTagName('ErrorCode')->item(0)->nodeValue;
+	        $short_message = $doc_response->getElementsByTagName('ShortMessage')->item(0)->nodeValue;
+	        $long_message = $doc_response->getElementsByTagName('LongMessage')->item(0)->nodeValue;
 
-	        if($message->item(0)->nodeValue == 'Failure') {
-		        $this->session->data['error'] = $this->language->get('error_ebay_api_call');
+	        if($message == 'Failure') {
+		        $this->session->data['error'] = strtoupper($severity_code) . ': ' . $long_message . ' Error Code: ' . $error_code;
 		        $url = '';
 		        if (isset($this->request->get['page'])) {
 		          $url .= '&page=' . $this->request->get['page'];
@@ -340,10 +343,14 @@ class ControllerAffiliateStockControl extends Controller {
 
 	        $doc_response = new DomDocument();
 	        $doc_response->loadXML($xml_response);
-	        $message = $doc_response->getElementsByTagName('Ack');
+	        $message = $doc_response->getElementsByTagName('Ack')->item(0)->nodeValue;
+	        $severity_code = $doc_response->getElementsByTagName('SeverityCode')->item(0)->nodeValue;
+	        $error_code = $doc_response->getElementsByTagName('ErrorCode')->item(0)->nodeValue;
+	        $short_message = $doc_response->getElementsByTagName('ShortMessage')->item(0)->nodeValue;
+	        $long_message = $doc_response->getElementsByTagName('LongMessage')->item(0)->nodeValue;
 
-	        if($message->item(0)->nodeValue == 'Failure') {
-		        $this->session->data['error'] = $this->language->get('error_ebay_api_call');
+	        if($message == 'Failure') {
+		        $this->session->data['error'] = strtoupper($severity_code) . ': ' . $long_message . ' Error Code: ' . $error_code;
 		        $url = '';
 		        if (isset($this->request->get['page'])) {
 		          $url .= '&page=' . $this->request->get['page'];
@@ -385,10 +392,14 @@ class ControllerAffiliateStockControl extends Controller {
 
 	        $doc_response = new DomDocument();
 	        $doc_response->loadXML($xml_response);
-	        $message = $doc_response->getElementsByTagName('Ack');
+	        $message = $doc_response->getElementsByTagName('Ack')->item(0)->nodeValue;
+	        $severity_code = $doc_response->getElementsByTagName('SeverityCode')->item(0)->nodeValue;
+	        $error_code = $doc_response->getElementsByTagName('ErrorCode')->item(0)->nodeValue;
+	        $short_message = $doc_response->getElementsByTagName('ShortMessage')->item(0)->nodeValue;
+	        $long_message = $doc_response->getElementsByTagName('LongMessage')->item(0)->nodeValue;
 
-	        if($message->item(0)->nodeValue == 'Failure') {
-		        $this->session->data['error'] = $this->language->get('error_ebay_api_call');
+	        if($message == 'Failure') {
+		        $this->session->data['error'] = strtoupper($severity_code) . ': ' . $long_message . ' Error Code: ' . $error_code;
 		        $url = '';
 		        if (isset($this->request->get['page'])) {
 		          $url .= '&page=' . $this->request->get['page'];
@@ -448,10 +459,14 @@ class ControllerAffiliateStockControl extends Controller {
 
 	        $doc_response = new DomDocument();
 	        $doc_response->loadXML($xml_response);
-	        $message = $doc_response->getElementsByTagName('Ack');
+	        $message = $doc_response->getElementsByTagName('Ack')->item(0)->nodeValue;
+	        $severity_code = $doc_response->getElementsByTagName('SeverityCode')->item(0)->nodeValue;
+	        $error_code = $doc_response->getElementsByTagName('ErrorCode')->item(0)->nodeValue;
+	        $short_message = $doc_response->getElementsByTagName('ShortMessage')->item(0)->nodeValue;
+	        $long_message = $doc_response->getElementsByTagName('LongMessage')->item(0)->nodeValue;
 
-	        if($message->item(0)->nodeValue == 'Failure') {
-		        $this->session->data['error'] = $this->language->get('error_ebay_api_call');
+	        if($message == 'Failure') {
+		        $this->session->data['error'] = strtoupper($severity_code) . ': ' . $long_message . ' Error Code: ' . $error_code;
 		        $url = '';
 		        if (isset($this->request->get['page'])) {
 		          $url .= '&page=' . $this->request->get['page'];
@@ -517,10 +532,14 @@ class ControllerAffiliateStockControl extends Controller {
 
 			        $doc_response = new DomDocument();
 			        $doc_response->loadXML($xml_response);
-			        $message = $doc_response->getElementsByTagName('Ack');
+			        $message = $doc_response->getElementsByTagName('Ack')->item(0)->nodeValue;
+	        		$severity_code = $doc_response->getElementsByTagName('SeverityCode')->item(0)->nodeValue;
+	        		$error_code = $doc_response->getElementsByTagName('ErrorCode')->item(0)->nodeValue;
+	        		$short_message = $doc_response->getElementsByTagName('ShortMessage')->item(0)->nodeValue;
+	        		$long_message = $doc_response->getElementsByTagName('LongMessage')->item(0)->nodeValue;
 
-			        if($message->item(0)->nodeValue == 'Failure') {
-				        $this->session->data['error'] = $this->language->get('error_ebay_api_call');
+	        		if($message == 'Failure') {
+				        $this->session->data['error'] = strtoupper($severity_code) . ': ' . $long_message . ' Error Code: ' . $error_code;
 				        $url = '';
 				        if (isset($this->request->get['page'])) {
 				          $url .= '&page=' . $this->request->get['page'];

@@ -418,7 +418,7 @@ class ControllerAffiliateCsvImport extends Controller {
 
 						  // Get gallery images
 						  $data = array();
-						  if(isset($this->request->post['search_image'])) {
+						  // if(isset($this->request->post['search_image'])) {
 							  preg_match_all('/(https?).*?(jpg|png|gif)/i', $this->data['csv'][$key]['description'], $media);
 							  foreach($media[0] as $img) {
 								  if ($isFirst) {
@@ -429,9 +429,9 @@ class ControllerAffiliateCsvImport extends Controller {
 								  $data[] = $img;
 							  }
 							  $this->data['csv'][$key]['gallery_images'] = $data;
-						  } else {
-							  $this->data['csv'][$key]['gallery_images'] = '';
-						  }
+						  // } else {
+							 //  $this->data['csv'][$key]['gallery_images'] = '';
+						  // }
 
 						  // Clean up product description
 						  // Remove @@@@%, %0D & %0A
@@ -472,7 +472,7 @@ class ControllerAffiliateCsvImport extends Controller {
 
 						  $model_matcher = '/([0-9]{6,7}\s?\D[0-9]{1,2})/i';
 						  preg_match($model_matcher,$this->data['csv'][$key]['description'],$model);
-						  $this->data['csv'][$key]['model'] = $model[1];
+						  // $this->data['csv'][$key]['model'] = $model[1];
 						  $this->data['csv'][$key]['description'] = preg_replace($model_matcher,'',$this->data['csv'][$key]['description']);
 						  
 						  // Domestic shipping

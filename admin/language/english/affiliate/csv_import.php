@@ -64,8 +64,6 @@ $_['text_linked_product_pagination']   = 'Linked Products Pagination';
 // buttons
 $_['button_import']                    = 'Import';
 $_['button_cancel']                    = 'Cancel';
-$_['button_load_profile']              = 'Load Profile';
-$_['button_update_profile']            = 'Update Profile';
 $_['button_clear_dates']               = 'Clear Dates';
 $_['button_reload']                    = 'Reload';
 $_['button_edit_linked_products']      = 'Edit Linked Products';
@@ -73,6 +71,7 @@ $_['button_edit_unlinked_products']    = 'Edit Unlinked Products';
 $_['button_clear_products']            = 'Clear Products';
 $_['button_edit_list']                 = 'Edit';
 $_['button_activate_linked_products']  = 'Activate Product Links';
+$_['button_set_ebay_profile']         =	'Save Profile';
 
 // error
 $_['error']							   = 'ERROR: There was an error in your request, please try again';
@@ -88,6 +87,8 @@ $_['error_developer_id']               = 'WARNING: eBay developers Developer ID 
 $_['error_application_id']             = 'WARNING: eBay developers Application ID is required for the API call';
 $_['error_site_id']                    = 'WARNING: eBay developers Site ID is required for the API call';
 $_['error_user_token']                 = 'WARNING: eBay developers User Token is required for the API call';
+$_['error_compatability_level']        = 'ERROR: eBay Compatability Level is required for the API call';
+
 $_['error_ebay_call']                  = 'ERROR: The eBay call request has failed, timed out or your date interval has exceeded 121 days. Try decreasing your date range and re-send. If problem\'s persist contact the site administrator.';
 
 // success
@@ -103,7 +104,7 @@ $_['success_activate_product_links']   = 'Success: Linked products are now activ
 $_['entry_select']                     = 'Please Select One';
 
 
-
+$_['error_test'] = 'ERROR TEST';
 
 
 

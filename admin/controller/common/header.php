@@ -115,6 +115,9 @@ class ControllerCommonHeader extends Controller {
 			$this->data['text_csv_import']                  = $this->language->get('text_csv_import');
 			$this->data['text_import_ebayid']               = $this->language->get('text_import_ebayid');
 			$this->data['text_import_csv']                  = $this->language->get('text_import_csv');
+			$this->data['text_import'] 						= $this->language->get('text_import');
+
+			// stock_control
 			$this->data['text_stock_control']               = $this->language->get('text_stock_control');
 			$this->data['text_linked_products']             = $this->language->get('text_linked_products');
 			$this->data['text_unlinked_products']           = $this->language->get('text_unlinked_products');

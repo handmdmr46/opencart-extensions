@@ -169,8 +169,13 @@ $(document).ready(function(){
       <!-- Consider using vqmod to initiate plugin -->
       <li id="csv-import"><a class="top"><?php echo $text_csv_import; ?></a>
         <ul>
-          <li><a href="<?php echo $csv_import; ?>"><?php echo $text_import_csv; ?></a></li>
-          <li><a href="<?php echo $ebayid_import; ?>"><?php echo $text_import_ebayid; ?></a></li>
+          <li><a class="parent"><?php echo $text_import; ?></a>
+              <ul>
+                <li><a href="<?php echo $csv_import; ?>"><?php echo $text_import_csv; ?></a></li>
+                <li><a href="<?php echo $ebayid_import; ?>"><?php echo $text_import_ebayid; ?></a></li>
+              </ul>
+          </li>
+          
           <li><a class="parent" href="<?php echo $stock_control; ?>"><?php echo $text_stock_control; ?></a>
               <ul>
                 <li><a href="<?php echo $linked_products; ?>"><?php echo $text_linked_products; ?></a></li>

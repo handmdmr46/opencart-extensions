@@ -24,6 +24,8 @@ $_['button_load_profile']             =	'Load Profile';
 $_['button_ebay_call']                =	'eBay Call';
 $_['button_cancel']                   =	'Cancel';
 $_['button_edit']                     = 'Edit';
+$_['button_remove']                   = 'Remove';
+$_['button_link_product']             = 'Link Product';
 
 // Error
 $_['error_user_token']                = 'ERROR: eBay User Token is required for the API call';
@@ -44,7 +46,9 @@ $_['success_get_item']                = 'SUCCESS: eBay call getItem completed';
 $_['success_get_orders']              = 'SUCCESS: eBay call getOrders completed';
 $_['success_end_item']                = 'SUCCESS: eBay call endFixedPriceItem completed';
 $_['success_revise_item']             = 'SUCCESS: eBay call reviseInventoryStatus completed';
-$_['success_edit']                    = 'Success: Product edit has been saved.';
+$_['success_edit']                    = 'SUCCESS: Product edit has been saved.';
+$_['success_remove']                  = 'SUCCESS: Product Link has been removed';
+$_['success_link_product']            = 'SUCCESS: Product has been added to the Linked Product list and is currently active.';
 
 
 ?>

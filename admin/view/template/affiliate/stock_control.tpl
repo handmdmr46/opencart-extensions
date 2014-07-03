@@ -71,7 +71,7 @@
 		          <td>
 		            <input name="certification_id" value="<?php echo $certification_id; ?>" type="text" size="100" required>
 		            <?php if ($error_certification_id) { ?>
-		            <span class="error"><?php echo $error_certification_id; ?></span>
+		            	<span class="error"><?php echo $error_certification_id; ?></span>
 		            <?php } ?>
 		          </td>
 		          <td></td>
@@ -90,7 +90,7 @@
 			            <?php } ?>
 		            </select>
 		            <?php if ($error_site_id) { ?>
-		            <span class="error"><?php echo $error_site_id; ?></span>
+		            	<span class="error"><?php echo $error_site_id; ?></span>
 		            <?php } ?>
 		          </td>
 		        </tr>
@@ -98,17 +98,17 @@
 		          <td><span class="required">* </span><?php echo $text_compat_level; ?><span class="help"><?php echo $text_compat_help; ?></span></td>
 		          <td>
 		            <select name="compatability_level">
-		            <option value="999"><?php echo $text_select; ?></option>
-		            <?php foreach ($compat_levels as $level) { ?>
-		            <?php if (isset($compat) && $compat == $level['level'] ) { ?>
-		            <option value="<?php echo $level['level']; ?>" selected><?php echo $level['level']; ?></option>		            
-		            <?php } else { ?>
-		            <option value="<?php echo $level['level']; ?>"><?php echo $level['level']; ?></option>
-		            <?php } ?>
-		            <?php } ?>
+			            <option value="999"><?php echo $text_select; ?></option>
+			            <?php foreach ($compat_levels as $level) { ?>
+				            <?php if (isset($compat) && $compat == $level['level'] ) { ?>
+				            	<option value="<?php echo $level['level']; ?>" selected><?php echo $level['level']; ?></option>		            
+				            <?php } else { ?>
+				            	<option value="<?php echo $level['level']; ?>"><?php echo $level['level']; ?></option>
+				            <?php } ?>
+			            <?php } ?>
 		            </select>
 		            <?php if ($error_compatability_level) { ?>
-		            <span class="error"><?php echo $error_compatability_level; ?></span>
+		            	<span class="error"><?php echo $error_compatability_level; ?></span>
 		            <?php } ?>
 		          </td>
 		          <td></td>

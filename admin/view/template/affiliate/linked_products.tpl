@@ -23,7 +23,8 @@
       <h1><img src="view/image/download.png" alt="" /> <?php echo $heading_title; ?></h1>
       <h1 class="wait" style="margin-left:1700px; display: none;">Please Wait, this may take awhile..... &nbsp;<img src="view/image/loading.gif" alt="" width="20" height="20" /></h1>
       <div class="buttons">
-        <a onclick="$('#form').attr('action', '<?php echo $edit; ?>'); $('#form').submit();" class="button"><?php echo $button_edit; ?></a>
+        <a onclick="$('#form').attr('action', '<?php echo $edit; ?>'); $('#form').submit(); startLoadingSpinner();" class="button"><?php echo $button_edit; ?></a>
+        <a onclick="$('#form').attr('action', '<?php echo $remove; ?>'); $('#form').submit(); startLoadingSpinner();" class="button"><?php echo $button_remove; ?></a>
         <a href="<?php echo $cancel; ?>" class="button"><?php echo $button_cancel; ?></a>
       </div>
     </div><!-- .heading -->
@@ -65,5 +66,13 @@
     <div class="pagination"><?php echo $pagination; ?></div>
   </div><!-- .box -->
 </div><!-- #content -->
+
+<script type="text/javascript"><!--
+
+  function startLoadingSpinner(){
+      $('.wait').show();
+  }
+
+//--></script>
 
 <?php echo $footer; ?>

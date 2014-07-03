@@ -29,11 +29,12 @@ class ControllerAffiliateLinkedProducts extends Controller {
 		);
 
 		//Language
-		$this->data['heading_title'] = $this->language->get('heading_title_linked_products');
-		$this->data['button_edit'] = $this->language->get('button_edit');
-		$this->data['button_cancel'] = $this->language->get('button_cancel');
-		$this->data['text_ebay_item_id'] = $this->language->get('text_ebay_item_id');
-		$this->data['text_product_id'] = $this->language->get('text_product_id');
+		$this->data['heading_title']      = $this->language->get('heading_title_linked_products');
+		$this->data['button_edit']        = $this->language->get('button_edit');
+		$this->data['button_cancel']      = $this->language->get('button_cancel');
+		$this->data['button_remove']      = $this->language->get('button_remove');
+		$this->data['text_ebay_item_id']  = $this->language->get('text_ebay_item_id');
+		$this->data['text_product_id']    = $this->language->get('text_product_id');
 		$this->data['text_product_title'] = $this->language->get('text_product_title');
 
 		// Error
@@ -67,7 +68,7 @@ class ControllerAffiliateLinkedProducts extends Controller {
 	      $url .= '&page=' . $this->request->get['page'];
 	    }
 
-	    $limit = 50;
+	    $limit = 100;
 	    $start = ($page - 1) * $limit;
 
 	    // Variables
@@ -76,6 +77,7 @@ class ControllerAffiliateLinkedProducts extends Controller {
 
 	    // Buttons
 	    $this->data['edit'] = $this->url->link('affiliate/linked_products/edit', 'token=' . $this->session->data['token'] . $url, 'SSL');
+	    $this->data['remove'] = $this->url->link('affiliate/linked_products/remove', 'token=' . $this->session->data['token'] . $url, 'SSL');
 	    $this->data['cancel'] = $this->url->link('common/home', 'token=' . $this->session->data['token'] . $url, 'SSL');
 
 	    // Pagination
@@ -116,10 +118,34 @@ class ControllerAffiliateLinkedProducts extends Controller {
 	          
 	          $ebay_item_id_str = $product_id . '_ebay_item_id';
 	          $ebay_item_id     = $this->request->post[$ebay_item_id_str];
-	          $this->model_affiliate_stock_control->editLinkedProductEbayItemId($product_id, $ebay_item_id);
+	          $this->model_affiliate_stock_control->setLinkedProductEbayItemId($product_id, $ebay_item_id);
 	      }
 
 	      $this->session->data['success'] = $this->language->get('success_edit');
+	      $this->redirect($this->url->link('affiliate/linked_products', 'token=' . $this->session->data['token'] . $url, 'SSL'));
+	    }
+
+	    $this->session->data['error'] = $this->language->get('error_edit');
+	    $this->redirect($this->url->link('affiliate/linked_products', 'token=' . $this->session->data['token'] . $url, 'SSL'));
+	}
+
+	public function remove() {
+		$this->language->load('affiliate/stock_control');
+		$this->document->setTitle($this->language->get('heading_title_linked_products'));
+		$this->load->model('affiliate/stock_control');
+
+	    $url = '';
+
+	    if (isset($this->request->get['page'])) {
+	        $url .= '&page=' . $this->request->get['page'];
+	    }
+
+	    if (isset($this->request->post['selected'])) {
+	      foreach ($this->request->post['selected'] as $product_id) {	          
+	      	$this->model_affiliate_stock_control->removeProductLink($product_id);
+	      }
+
+	      $this->session->data['success'] = $this->language->get('success_remove');
 	      $this->redirect($this->url->link('affiliate/linked_products', 'token=' . $this->session->data['token'] . $url, 'SSL'));
 	    }
 

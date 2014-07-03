@@ -88,7 +88,7 @@
             </td>
             <!-- price -->
             <td>
-            <input type="text" class="editable center width75" name="<?php echo $product['product_id']; ?>_price" value="$<?php echo number_format($product['price'],2); ?>" onclick="check(<?php echo $product['product_id']; ?>)">
+            <input type="text" class="editable center width75" name="<?php echo $product['product_id']; ?>_price" value="<?php echo number_format($product['price'],2); ?>" onclick="check(<?php echo $product['product_id']; ?>)">
             </td>
             <!-- lenght -->
             <td>

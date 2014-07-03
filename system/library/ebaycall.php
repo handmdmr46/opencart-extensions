@@ -22,10 +22,10 @@ class Ebaycall {
 
 	public function sendHttpRequest($body) {
 		//Production
-		// $endpoint = "https://api.ebay.com/ws/api.dll";
+		$endpoint = "https://api.ebay.com/ws/api.dll";
 
 		//Sandbox
-		$endpoint = "https://api.sandbox.ebay.com/ws/api.dll";
+		// $endpoint = "https://api.sandbox.ebay.com/ws/api.dll";
 
 		$headers = $this->buildEbayHeaders();
 

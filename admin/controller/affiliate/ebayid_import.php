@@ -62,6 +62,7 @@ class ControllerAffiliateEbayidImport extends Controller {
 		$this->data['text_ebay_item_id']                = $this->language->get('text_ebay_item_id');
 		$this->data['text_linked_product_pagination']   = $this->language->get('text_linked_product_pagination');
 		$this->data['text_unlinked_product_pagination'] = $this->language->get('text_unlinked_product_pagination');
+		$this->data['text_select'] 						= $this->language->get('text_select');
 
 	    // Error
 	    if (isset($this->session->data['error'])) {
@@ -199,6 +200,12 @@ class ControllerAffiliateEbayidImport extends Controller {
 	      $this->data['site_id'] = '';
 	    }
 
+	    if(!empty($profiles)) {
+	      $this->data['compat'] = $profiles['compat'];
+	    } else {
+	      $this->data['compat'] = '';
+	    }
+
 	    $this->template = 'affiliate/ebayid_import.tpl';
 
 	    $this->children = array(
@@ -256,12 +263,13 @@ class ControllerAffiliateEbayidImport extends Controller {
 	      $doc_response->loadXML($xml_response);
 
 	      $message = $doc_response->getElementsByTagName('Ack');
-	      $severity_code = $doc_response->getElementsByTagName('SeverityCode')->item(0)->nodeValue;
-	      $error_code = $doc_response->getElementsByTagName('ErrorCode')->item(0)->nodeValue;
-	      $short_message = $doc_response->getElementsByTagName('ShortMessage')->item(0)->nodeValue;
-	      $long_message = $doc_response->getElementsByTagName('LongMessage')->item(0)->nodeValue;
+	      
 
 	      if($message->item(0)->nodeValue == 'Failure') {
+	      	$severity_code = $doc_response->getElementsByTagName('SeverityCode')->item(0)->nodeValue;
+	      	$error_code = $doc_response->getElementsByTagName('ErrorCode')->item(0)->nodeValue;
+	      	$short_message = $doc_response->getElementsByTagName('ShortMessage')->item(0)->nodeValue;
+	      	$long_message = $doc_response->getElementsByTagName('LongMessage')->item(0)->nodeValue;
 	        $this->session->data['error'] = strtoupper($severity_code) . ': ' . $long_message . ' Error Code: ' . $error_code;
 	        $url = '';
 	        if (isset($this->request->get['page'])) {
@@ -358,14 +366,12 @@ class ControllerAffiliateEbayidImport extends Controller {
 		$this->document->setTitle($this->language->get('heading_title_ebayid_import'));
 		$this->load->model('affiliate/stock_control');
 
-	    if ($this->validateSaveEbayProfile() == 1) {
-	        $this->redirect($this->url->link('affiliate/ebayid_import', 'token=' . $this->session->data['token'], 'SSL'));
-	        $this->session->data['error'] = $this->language->get('error');
-	    }
-
-    	$this->model_affiliate_stock_control->setEbayProfile($this->request->post);
-    	$this->session->data['success'] = $this->language->get('success_profile');
-    	$this->redirect($this->url->link('affiliate/ebayid_import', 'token=' . $this->session->data['token'], 'SSL'));
+	    if ($this->validateSaveEbayProfile() == 1) {	        	        	        
+	        $this->model_affiliate_stock_control->setEbayProfile($this->request->post);
+    		$this->session->data['success'] = $this->language->get('success_profile');
+    		$this->redirect($this->url->link('affiliate/ebayid_import', 'token=' . $this->session->data['token'], 'SSL'));
+	    } 
+	    $this->redirect($this->url->link('affiliate/ebayid_import', 'token=' . $this->session->data['token'], 'SSL'));    	
     }
 
     protected function validateSaveEbayProfile() {

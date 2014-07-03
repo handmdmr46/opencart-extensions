@@ -29,12 +29,13 @@ class ControllerAffiliateUnlinkedProducts extends Controller {
 		);
 
 		//Language
-		$this->data['heading_title'] = $this->language->get('heading_title_unlinked_products');
-		$this->data['button_edit'] = $this->language->get('button_edit');
-		$this->data['button_cancel'] = $this->language->get('button_cancel');
-		$this->data['text_ebay_item_id'] = $this->language->get('text_ebay_item_id');
-		$this->data['text_product_id'] = $this->language->get('text_product_id');
-		$this->data['text_product_title'] = $this->language->get('text_product_title');
+		$this->data['heading_title']       = $this->language->get('heading_title_unlinked_products');
+		$this->data['button_edit']         = $this->language->get('button_edit');
+		$this->data['button_cancel']       = $this->language->get('button_cancel');
+		$this->data['button_link_product'] = $this->language->get('button_link_product');
+		$this->data['text_ebay_item_id']   = $this->language->get('text_ebay_item_id');
+		$this->data['text_product_id']     = $this->language->get('text_product_id');
+		$this->data['text_product_title']  = $this->language->get('text_product_title');
 
 
 		// Error
@@ -68,11 +69,11 @@ class ControllerAffiliateUnlinkedProducts extends Controller {
 	      $url .= '&page=' . $this->request->get['page'];
 	    }
 
-	    $limit = 10;
+	    $limit = 50;
 	    $start = ($page - 1) * $limit;
 
 	    // Buttons
-	    $this->data['edit'] = $this->url->link('affiliate/unlinked_products/edit', 'token=' . $this->session->data['token'] . $url, 'SSL');
+	    $this->data['link_product'] = $this->url->link('affiliate/unlinked_products/linkProduct', 'token=' . $this->session->data['token'] . $url, 'SSL');
 	    $this->data['cancel'] = $this->url->link('common/home', 'token=' . $this->session->data['token'] . $url, 'SSL');
 
 	    // Variables
@@ -100,8 +101,45 @@ class ControllerAffiliateUnlinkedProducts extends Controller {
 	}
 
 	public function linkProduct() {
+			$this->language->load('affiliate/stock_control');
+			$this->document->setTitle($this->language->get('heading_title_unlinked_products'));
+			$this->load->model('affiliate/stock_control');
 
+			$url = '';
+
+			if (isset($this->request->get['page'])) {
+			$url .= '&page=' . $this->request->get['page'];
+			}
+
+			if (isset($this->request->post['selected']) /*&& $this->validateLinkProduct() == 1*/) {
+				foreach ($this->request->post['selected'] as $product_id) {
+					$ebay_item_id_str = $product_id . '_ebay_item_id';
+					$ebay_item_id = $this->request->post[$ebay_item_id_str];
+					$this->model_affiliate_stock_control->setProductLink($product_id, $ebay_item_id);
+				}
+
+				$this->session->data['success'] = $this->language->get('success_link_product');
+				$this->redirect($this->url->link('affiliate/unlinked_products', 'token=' . $this->session->data['token'] . $url, 'SSL'));
+			}
+
+			$this->session->data['error'] = $this->language->get('error_edit');
+			$this->redirect($this->url->link('affiliate/unlinked_products', 'token=' . $this->session->data['token'] . $url, 'SSL'));
 	}
+
+	/*protected function validateLinkProduct() {
+		$boolean = 1;
+
+		foreach($this->request->post['selected'] as $pid) {	
+			
+				if ((utf8_strlen($pid . '_ebay_item_id') < 1) || (utf8_strlen($pid . '_ebay_item_id') > 12)) {
+					$this->session->data['error'] = 'testing `validateLinkProduct()';
+					$boolean = 0;
+				}
+			
+			
+		}
+		return $boolean;
+	}*/
 
 
 

@@ -32,7 +32,7 @@ class ControllerAffiliateLinkedProducts extends Controller {
 		$this->data['heading_title']      = $this->language->get('heading_title_linked_products');
 		$this->data['button_edit']        = $this->language->get('button_edit');
 		$this->data['button_cancel']      = $this->language->get('button_cancel');
-		$this->data['button_remove']      = $this->language->get('button_remove');
+		$this->data['button_delete']      = $this->language->get('button_delete');
 		$this->data['text_ebay_item_id']  = $this->language->get('text_ebay_item_id');
 		$this->data['text_product_id']    = $this->language->get('text_product_id');
 		$this->data['text_product_title'] = $this->language->get('text_product_title');
@@ -71,7 +71,7 @@ class ControllerAffiliateLinkedProducts extends Controller {
 	    $limit = 100;
 	    $start = ($page - 1) * $limit;
 
-	    // Variables
+	    // Variables	    
 	    $total                    		 = $this->model_affiliate_stock_control->getTotalLinkedProducts();
 	    $this->data['linked_products']   = $this->model_affiliate_stock_control->getLinkedProducts($start, $limit);
 

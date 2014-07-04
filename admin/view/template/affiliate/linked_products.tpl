@@ -1,6 +1,5 @@
 <?php echo $header; ?>
 
-
 <div id="content">
 
   <div class="breadcrumb">
@@ -23,9 +22,9 @@
       <h1><img src="view/image/download.png" alt="" /> <?php echo $heading_title; ?></h1>
       <h1 class="wait" style="margin-left:1700px; display: none;">Please Wait, this may take awhile..... &nbsp;<img src="view/image/loading.gif" alt="" width="20" height="20" /></h1>
       <div class="buttons">
-        <a onclick="$('#form').attr('action', '<?php echo $edit; ?>'); $('#form').submit(); startLoadingSpinner();" class="button"><?php echo $button_edit; ?></a>
-        <a onclick="$('#form').attr('action', '<?php echo $remove; ?>'); $('#form').submit(); startLoadingSpinner();" class="button"><?php echo $button_remove; ?></a>
-        <a href="<?php echo $cancel; ?>" class="button"><?php echo $button_cancel; ?></a>
+        <a onclick="$('#form').attr('action', '<?php echo $edit; ?>'); $('#form').submit(); startLoadingSpinner();" class="button" title="edit the selected product link"><?php echo $button_edit; ?></a>
+        <a onclick="$('#form').attr('action', '<?php echo $remove; ?>'); $('#form').submit(); startLoadingSpinner();" class="button" title="delete the selected product link"><?php echo $button_delete; ?></a>
+        <a href="<?php echo $cancel; ?>" class="button" title="return to admin home"><?php echo $button_cancel; ?></a>
       </div>
     </div><!-- .heading -->
 
@@ -70,7 +69,11 @@
 <script type="text/javascript"><!--
 
   function startLoadingSpinner(){
-      $('.wait').show();
+    $('.wait').show();
+  }
+
+  function check(id) {
+    document.getElementById(id + '_select').setAttribute('checked','checked');
   }
 
 //--></script>

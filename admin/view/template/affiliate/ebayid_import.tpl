@@ -23,9 +23,9 @@
       <h1><img src="view/image/download.png" alt="" /> <?php echo $heading_title; ?></h1>
       <h1 class="wait" style="margin-left:1700px; display: none;">Please Wait, this may take awhile..... &nbsp;<img src="view/image/loading.gif" alt="" width="20" height="20" /></h1>
       <div class="buttons">
-        <a onclick="start_import(); $('#form').attr('action', '<?php echo $import_ids; ?>'); $('#form').submit();" class="button"><?php echo $button_import; ?></a>
-        <a onclick="$('#form').attr('action', '<?php echo $set_ebay_profile; ?>'); $('#form').submit();" class="button"><?php echo $button_set_ebay_profile; ?></a>
-        <a href="<?php echo $cancel; ?>" class="button"><?php echo $button_cancel; ?></a>
+        <a onclick="start_import(); $('#form').attr('action', '<?php echo $import_ids; ?>'); $('#form').submit();" class="button" title="start the eBay ItemID import"><?php echo $button_import; ?></a>
+        <a onclick="$('#form').attr('action', '<?php echo $set_ebay_profile; ?>'); $('#form').submit();" class="button" title="save the eBay developer profile settings"><?php echo $button_set_ebay_profile; ?></a>
+        <a href="<?php echo $cancel; ?>" class="button" title="return to admin home"><?php echo $button_cancel; ?></a>
       </div>
     </div><!-- .heading -->
 
@@ -141,8 +141,8 @@
     <div class="heading">
       <h1><img src="view/image/review.png" alt="" /> <?php echo $text_start_dates; ?></h1>
       <div class="buttons">
-        <a href="<?php echo $clear_dates; ?>" class="button"><?php echo $button_clear_dates; ?></a>
-        <a href="<?php echo $reload; ?>" class="button"><?php echo $button_reload; ?></a>
+        <a href="<?php echo $clear_dates; ?>" class="button" title="clear all eBay Import start to and start from dates"><?php echo $button_clear_dates; ?></a>
+        <a href="<?php echo $reload; ?>" class="button" title="reload the webpage"><?php echo $button_reload; ?></a>
       </div>
     </div>
 

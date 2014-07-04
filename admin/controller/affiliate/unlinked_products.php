@@ -76,7 +76,7 @@ class ControllerAffiliateUnlinkedProducts extends Controller {
 	    $this->data['link_product'] = $this->url->link('affiliate/unlinked_products/linkProduct', 'token=' . $this->session->data['token'] . $url, 'SSL');
 	    $this->data['cancel'] = $this->url->link('common/home', 'token=' . $this->session->data['token'] . $url, 'SSL');
 
-	    // Variables
+	    // Variables	    
 		$total                           = $this->model_affiliate_stock_control->getTotalUnlinkedProducts();
 		$this->data['unlinked_products'] = $this->model_affiliate_stock_control->getUnlinkedProducts($start, $limit);
 

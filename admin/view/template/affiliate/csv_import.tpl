@@ -21,11 +21,12 @@
     <div class="heading">
       <h1><img src="admin/view/image/download.png" alt="" /> <?php echo $heading_title_csv_import; ?></h1>
       <h1 class="wait" style="margin-left:1850px; display:none;" ">Please Wait, this may take awhile..... &nbsp;<img src="view/image/loading.gif" alt="" width="20" height="20"/></h1>
-      <div class="buttons">
-          <a onclick="start_import(); $('#form').submit();" class="button"><?php echo $button_import; ?></a>
-          <a onclick="$('#form').attr('action', '<?php echo $edit; ?>'); $('#form').submit();" class="button"><?php echo $button_edit_list; ?></a>
-          <a onclick="$('#form').attr('action', '<?php echo $delete; ?>'); $('#form').submit();" class="button"><?php echo $button_delete; ?></a>
-          <a href="<?php echo $cancel; ?>" class="button"><?php echo $button_cancel; ?></a>
+      <div class="buttons">        
+          <a onclick="start_import(); $('#form').submit();" class="button" title="start the CSV import"><?php echo $button_import; ?></a>
+          <a onclick="$('#form').attr('action', '<?php echo $edit; ?>'); $('#form').submit();" class="button" title="edit the selected product"><?php echo $button_edit_list; ?></a>
+          <a onclick="$('#form').attr('action', '<?php echo $delete; ?>'); $('#form').submit();" class="button" title="delete the selected product"><?php echo $button_delete; ?></a>
+          <a onclick="$('#form').attr('action', '<?php echo $clear; ?>'); $('#form').submit();" class="button" title="clear the CSV table, does not delete anything"><?php echo $button_clear; ?></a>
+          <a href="<?php echo $cancel; ?>" class="button" title="return to admin home"><?php echo $button_cancel; ?></a>
       </div>
     </div><!-- .heading -->
 

@@ -40,14 +40,14 @@ class ModelAffiliateStockControl extends Model {
 
 	public function getTotalLinkedProducts() {
 		//bikesalvage
-		$count = $this->db->query("SELECT COUNT(*) AS `total` FROM " . DB_PREFIX . "product WHERE `linked` = '1' AND `affiliate_id` = '0'");
+		$count = $this->db->query("SELECT COUNT(*) AS `total` FROM " . DB_PREFIX . "ebay_listing");
 
 		return $count->row['total'];
 	}
 
 	public function getTotalUnlinkedProducts() {
 		//bikesalvage
-		$count = $this->db->query("SELECT COUNT(*) AS `total` FROM " . DB_PREFIX . "product WHERE `linked` = '0' AND `affiliate_id` = '0'");
+		$count = $this->db->query("SELECT COUNT(*) AS `total` FROM " . DB_PREFIX . "product WHERE `linked` = '0' AND `affiliate_id` = '0' AND `status` = '0'");
 
 		return $count->row['total'];
 	}
@@ -82,9 +82,8 @@ class ModelAffiliateStockControl extends Model {
 					'selected'     => isset($this->request->post['selected']) && in_array($data['product_id'], $this->request->post['selected'])
 				);
 		}
-
+		
 		return $product_data;
-
 	}
 
 	public function getUnlinkedProducts($start, $limit) {
@@ -123,15 +122,12 @@ class ModelAffiliateStockControl extends Model {
 		}
 
 		return $product_data;
-
 	}
 
 	public function setLinkedProductEbayItemId($product_id, $ebay_id) {
 		if (isset($ebay_id) ) {			
 			$this->db->query("UPDATE " . DB_PREFIX . "ebay_listing SET ebay_item_id = '" . $this->db->escape($ebay_id) . "' WHERE product_id = '" . $this->db->escape($product_id) . "'");
 		}
-
-
 	}
 
 	public function setProductLink($product_id, $ebay_id) {
@@ -139,14 +135,11 @@ class ModelAffiliateStockControl extends Model {
 			$this->db->query("UPDATE " . DB_PREFIX . "product SET linked = 1 WHERE product_id = '" . $this->db->escape($product_id) . "'");
 			$this->db->query("INSERT INTO " . DB_PREFIX . "ebay_listing SET ebay_item_id = '" . $this->db->escape($ebay_id) . "', product_id = '" . $this->db->escape($product_id) . "', affiliate_id = '0'");
 		}
-
-
 	}
 
 	public function removeProductLink($product_id) {
 		$this->db->query("UPDATE " . DB_PREFIX . "product SET linked = 0 WHERE product_id = '" . $this->db->escape($product_id) . "'");
 		$this->db->query("DELETE FROM " . DB_PREFIX . "ebay_listing WHERE product_id = '" . $this->db->escape($product_id) . "'");
-
 	}
 
 } // end class

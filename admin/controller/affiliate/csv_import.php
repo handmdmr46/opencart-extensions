@@ -4,6 +4,7 @@ class ControllerAffiliateCsvImport extends Controller {
 		$this->language->load('affiliate/csv_import');
 		$this->document->setTitle($this->language->get('heading_title_csv_import'));
 		$this->load->model('affiliate/csv_import');
+		// $this->document->addStyle('view/stylesheet/tooltip.css');
 
 		$this->import();
 	}
@@ -54,12 +55,12 @@ class ControllerAffiliateCsvImport extends Controller {
 		$this->data['text_weight']              = $this->language->get('text_weight');
 		$this->data['button_delete']            = $this->language->get('button_delete');
 		$this->data['button_edit_list']         = $this->language->get('button_edit_list');
+		$this->data['button_clear']             = $this->language->get('button_clear');
 		$this->data['text_confirm']             = $this->language->get('text_confirm');
 		$this->data['text_confirm_edit']        = $this->language->get('text_confirm_edit');
 		$this->data['entry_select']             = $this->language->get('entry_select');
 		$this->data['text_search_image']        = $this->language->get('text_search_image');
-		$this->data['text_search_image_help']   = $this->language->get('text_search_image_help');
-		//$this->data[''] = $this->language->get('');
+		$this->data['text_search_image_help']   = $this->language->get('text_search_image_help');		
 
 		// used for js filter() in approval.tpl
 		$this->data['token'] = $this->session->data['token'];
@@ -115,6 +116,13 @@ class ControllerAffiliateCsvImport extends Controller {
 			$this->data['success'] = '';
 		}
 
+		if (isset($this->session->data['success_clear'])) {
+    		$this->data['success'] = $this->session->data['success_clear'];
+			unset($this->session->data['success_clear']);
+		} else {
+			$this->data['success'] = '';
+		}
+
 		// Page, Start & Limit -- pagination --
 		if (isset($this->request->get['page'])) {
 			$page = $this->request->get['page'];
@@ -137,6 +145,7 @@ class ControllerAffiliateCsvImport extends Controller {
 		$this->data['cancel'] = $this->url->link('common/home', 'token=' . $this->session->data['token'], 'SSL');
 		$this->data['delete'] = $this->url->link('affiliate/csv_import/delete', 'token=' . $this->session->data['token'], 'SSL');
 		$this->data['edit'] = $this->url->link('affiliate/csv_import/edit', 'token=' . $this->session->data['token'], 'SSL');
+		$this->data['clear'] = $this->url->link('affiliate/csv_import/clear', 'token=' . $this->session->data['token'], 'SSL');
 		$this->data['loading'] = '';
 		$this->data['csv'] = array();
 		$this->data['csv_view'] = array();
@@ -167,12 +176,6 @@ class ControllerAffiliateCsvImport extends Controller {
 				  }
 
 				  if ($this->validImport($content)) {
-
-					  /*if(isset($this->request->post['skip_image'])) {
-						 $isFirst = true;
-					  } else {
-					    $isFirst = false;
-					  }*/
 
 					  $csv = new Parsecsv();
 
@@ -208,7 +211,8 @@ class ControllerAffiliateCsvImport extends Controller {
 
 					  foreach($this->data['csv'] as $key => $row) {
 						  // Get featured image
-						  $this->data['csv'][$key]['image'] = substr( parse_url( $this->data['csv'][$key]['image'], PHP_URL_PATH ), 1 );
+						  // $this->data['csv'][$key]['image'] = substr(parse_url($this->data['csv'][$key]['image'], PHP_URL_PATH), 1);
+					  	$this->data['csv'][$key]['image'] = parse_url($this->data['csv'][$key]['image'], PHP_URL_PATH);
 
 						  // Set Manufacturer ID from Title
 						  if (stripos($this->data['csv'][$key]['title'],'honda') !== false) {
@@ -414,33 +418,33 @@ class ControllerAffiliateCsvImport extends Controller {
 							  strpos($this->data['csv'][$key]['title'], 'T140') ? $this->data['csv'][$key]['category_id'] = 250 : '';
 							  #750 850 Commando
 						  }
-						  #if($this->data['csv'][$key]['manufacturer_id'] == 7) {}
+						  // if($this->data['csv'][$key]['manufacturer_id'] == 7) {}
 
-						  // Get gallery images
+						  /*
+						  // Get gallery images from description
 						  $data = array();
-						  // if(isset($this->request->post['search_image'])) {
-							  preg_match_all('/(https?).*?(jpg|png|gif)/i', $this->data['csv'][$key]['description'], $media);
-							  foreach($media[0] as $img) {
-								  if ($isFirst) {
-								   $isFirst = false;
-								   continue;
-								 }
-								  $img = substr( parse_url( $img, PHP_URL_PATH ), 1 );
-								  $data[] = $img;
-							  }
-							  $this->data['csv'][$key]['gallery_images'] = $data;
-						  // } else {
-							 //  $this->data['csv'][$key]['gallery_images'] = '';
-						  // }
+						
+						  preg_match_all('/(https?).*?(jpg|png|gif)/i', $this->data['csv'][$key]['description'], $media);
+						  foreach($media[0] as $img) {
+							  if ($isFirst) {
+							   $isFirst = false;
+							   continue;
+							 }
+						     $img = substr( parse_url( $img, PHP_URL_PATH ), 1 );
+						     $data[] = $img;
+						  }
+						  $this->data['csv'][$key]['gallery_images'] = $data;
+						  */
 
-						  // Clean up product description
-						  // Remove @@@@%, %0D & %0A
+						  // Clean up product description (Remove @@@@%, %0D & %0A)						  
 						  $this->data['csv'][$key]['description'] = str_ireplace ('%0d', '', $this->data['csv'][$key]['description']);
 						  $this->data['csv'][$key]['description'] = str_ireplace ('%0a', '', $this->data['csv'][$key]['description']);
 						  $this->data['csv'][$key]['description'] = str_ireplace('@@@@%','', $this->data['csv'][$key]['description']);
 
+						  /*
 						  // Remove images
 						  $this->data['csv'][$key]['description'] = preg_replace('/<img[^>]+\>/i', '', $this->data['csv'][$key]['description']);
+						  */
 
 						  // Remove HTML tags
 						  $this->data['csv'][$key]['description'] = preg_replace('(\<(/?[^\>]+)\>)', '', $this->data['csv'][$key]['description']);
@@ -460,20 +464,17 @@ class ControllerAffiliateCsvImport extends Controller {
 						  $this->data['csv'][$key]['description'] = str_replace('No small print.','',$this->data['csv'][$key]['description']);
 						  $this->data['csv'][$key]['description'] = str_replace('No hassle returns.','',$this->data['csv'][$key]['description']);
 
+						  /*
 						  // Match model code
-						  /*if(isset($this->request->post['search_models'])) {
+						  if(isset($this->request->post['search_models'])) {
 						  	$model_matcher = '/([0-9]{6,7}\s?\D[0-9]{1,2})/i';
 						  	preg_match($model_matcher,$this->data['csv'][$key]['description'],$model);
 						  	$this->data['csv'][$key]['model'] = $model[1];
-						  }*/
+						  }
 						  
-						  // Remove model from description
-						  // $this->data['csv'][$key]['description'] = preg_replace($model_matcher,'',$this->data['csv'][$key]['description']);
-
-						  $model_matcher = '/([0-9]{6,7}\s?\D[0-9]{1,2})/i';
-						  preg_match($model_matcher,$this->data['csv'][$key]['description'],$model);
-						  // $this->data['csv'][$key]['model'] = $model[1];
-						  $this->data['csv'][$key]['description'] = preg_replace($model_matcher,'',$this->data['csv'][$key]['description']);
+						  // Remove model from description						  
+						  $this->data['csv'][$key]['description'] = preg_replace($model_matcher,'',$this->data['csv'][$key]['description']);						  						  						  
+						  */
 						  
 						  // Domestic shipping
 						  if($this->data['csv'][$key]['shipping_dom'] == 'USPSPriorityFlatRateEnvelope'){
@@ -502,9 +503,7 @@ class ControllerAffiliateCsvImport extends Controller {
 						  }
 
 						 $this->model_affiliate_csv_import->addCsvImportProduct($this->data['csv'][$key]);
-
 					  }
-
 					  $this->session->data['success'] = $this->language->get('text_csv_success');
 					  $this->redirect($this->url->link('affiliate/csv_import', 'token=' . $this->session->data['token'] . $url, 'SSL'));
 				  } else {
@@ -539,6 +538,22 @@ class ControllerAffiliateCsvImport extends Controller {
 
 		$this->response->setOutput($this->render());
 
+	}
+
+	public function clear() {
+		$this->language->load('affiliate/csv_import');
+		$this->load->model('affiliate/csv_import');
+		$this->document->setTitle($this->language->get('heading_title_import_csv'));
+
+		$url = '';
+
+		if (isset($this->request->get['page'])) {
+			  $url .= '&page=' . $this->request->get['page'];
+		}
+
+		$this->model_affiliate_csv_import->clearCsvImportTable();
+		$this->session->data['success_clear'] = $this->language->get('success_clear');
+    	$this->redirect($this->url->link('affiliate/csv_import', 'token=' . $this->session->data['token'] . $url, 'SSL'));
 	}
 
 	public function edit() {

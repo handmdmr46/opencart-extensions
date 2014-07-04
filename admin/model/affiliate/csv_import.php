@@ -115,14 +115,13 @@ class ModelAffiliateCsvImport extends Model {
 	public function addCsvImportProduct($data) {
 
 		$image_array = explode('|', $data['image']);
-		$featured_image = '';
-		// $image_array[0] = $featured_image;
+		$featured_image = $image_array[0];
 
 		// product
 		$this->db->query("INSERT INTO " . DB_PREFIX . "product
 							SET `model` = '" . $this->db->escape($data['model']) . "',
 								`quantity` = '" . (int)$data['quantity'] . "',
-								`image` = '" . $this->db->escape($image_array[0]) . "',
+								`image` = '" . $this->db->escape(substr($featured_image, 1)) . "',
 								`manufacturer_id` = '" . (int)$data['manufacturer_id'] . "',
 								`price` = '" . (int)$data['price'] . "',
 								`weight` =  '" . (int)$data['weight'] . "',
@@ -152,8 +151,12 @@ class ModelAffiliateCsvImport extends Model {
 								 `meta_description` = '" . $this->db->escape($data['title']) . "',
 								 `meta_keyword` = '" . $manufacturer_name . "',
 								 `tag` = '" . $manufacturer_name . "'");
-
+		$isFirst = true;
 		foreach($image_array as $image) {
+			if($isFirst) {
+				$isFirst = false;
+				continue;
+			}
 			$image = substr(parse_url($image, PHP_URL_PATH), 1);
 			$this->db->query("INSERT INTO " . DB_PREFIX . "product_image  SET `product_id` = '" . (int)$product_id . "', `image` = '" . $this->db->escape($image) . "'");
 		}
@@ -285,6 +288,11 @@ class ModelAffiliateCsvImport extends Model {
 		}
 
 		return $product_data;
+	}
+
+	public function clearCsvImportTable() {
+		$this->db->query("UPDATE " . DB_PREFIX . "product SET csv_import = '0' WHERE csv_import = '1'");
+		//fortab
 	}
 
     public function editCsvImportProductInfo($product_id, $edit_data) {
@@ -469,128 +477,6 @@ class ModelAffiliateCsvImport extends Model {
 							  WHERE  product_id = '" . $this->db->escape($product_id) . "'");
 		}
 	}
-
-	/*public function activateLinkedProducts() {
-
-		$this->db->query("UPDATE " . DB_PREFIX . "product p
-						  SET    p.status = '1'
-						  WHERE  p.product_id IN (
-						  						  SELECT el.product_id
-						  						  FROM   " . DB_PREFIX . "ebay_listing el
-						  						  WHERE  el.active = '1'
-						  						  )
-					    ");
-		// for bikesalvage.com
-		$this->db->query("UPDATE  " . DB_PREFIX . "ebay_listing
-						  SET     `active` = '1'
-						  WHERE   `active` = '0'");
-	}*/
-
-
-	/*public  function getLinkedProducts($start, $limit) {
-		// bikesalvage
-		$sql = "SELECT    el.product_id,
-	  			  		  el.ebay_item_id,
-          		  		  pd.name
-				FROM      " . DB_PREFIX . "ebay_listing el
-				LEFT JOIN " . DB_PREFIX . "product_description pd ON (el.product_id = pd.product_id)
-				WHERE     el.active = '0'";
-
-		// affiliates
-		$sql = "SELECT    apl.product_id,
-	  			  		  apl.ebay_item_id,
-          		  		  pd.name
-				FROM      " . DB_PREFIX . "affiliate_product_link apl
-				LEFT JOIN " . DB_PREFIX . "product_description pd ON (apl.product_id = pd.product_id)
-				WHERE     apl.affiliate_id = '0'
-				AND 	  apl.active = '0'";
-
-		if(isset($start) || isset($limit)) {
-				if($start < 0) {
-					$start = 0;
-				}
-				if($limit < 1) {
-					$limit = 20;
-				}
-
-			    $sql .= " LIMIT " . (int)$start . "," . (int)$limit;
-		}
-
-		$query = $this->db->query($sql);
-		$product_data = array();
-
-		foreach($query->rows as $data) {
-				$product_data[] = array (
-					'product_id'   => $data['product_id'],
-					'ebay_item_id' => $data['ebay_item_id'],
-					'title'        => $data['name'],
-					'selected'     => isset($this->request->post['selected']) && in_array($data['product_id'], $this->request->post['selected'])
-				);
-		}
-
-		return $product_data;
-	}*/
-
-	/*public  function getUnlinkedProducts($start, $limit) {
-
-		$sql = "SELECT   pd.name,
- 					 	 pd.product_id
-			    FROM     " . DB_PREFIX . "product_description pd
-				WHERE    pd.product_id IN (
-										   SELECT product_id p
-                   					   	   FROM   " . DB_PREFIX . "product p
-                   					   	   WHERE  p.status = '0'
-                   					   	   AND    p.affiliate_id = '0'
-                   					   	   AND 	  p.csv_import = '1'
-                   					   	   )
-				ORDER BY pd.name DESC";
-
-		if(isset($start) || isset($limit)) {
-			if($start < 0) {
-				$start = 0;
-			}
-			if($limit < 1) {
-				$limit = 20;
-			}
-
-		    $sql .= " LIMIT " . (int)$start . "," . (int)$limit;
-		}
-
-		$query_product = $this->db->query($sql);
-		$product_data = array();
-
-		foreach ($query_product->rows as $data) {
-			$product_data[] = array(
-				'product_id' => $data['product_id'],
-				'title'      => $data['name'],
-				'selected'     => isset($this->request->post['selected']) && in_array($data['product_id'], $this->request->post['selected'])
-			);
-		}
-
-		return $product_data;
-	}*/
-
-	/*public  function editLinkedProducts($product_id, $ebay_id) {
-		if (isset($ebay_id) ) {
-			$this->db->query("DELETE FROM " . DB_PREFIX . "affiliate_product_link WHERE `product_id` = '" . $this->db->escape($product_id) . "' AND `affiliate_id` = '0'");
-			$this->db->query("INSERT INTO " . DB_PREFIX . "affiliate_product_link
-							  SET `product_id` = '" . $this->db->escape($product_id) . "',
-							  	  `ebay_item_id` = '" . $this->db->escape($ebay_id) . "',
-							  	  `affiliate_id` = '0'");
-		}
-	}*/
-
-	/*public  function editUnlinkedProducts($product_id, $ebay_id) {
-		if (isset($ebay_id) ) {
-			$this->db->query("INSERT INTO " . DB_PREFIX . "affiliate_product_link
-							  SET         `product_id` = '" . $this->db->escape($product_id) . "',
-							  	          `ebay_item_id` = '" . $this->db->escape($ebay_id) . "',
-							  	          `affiliate_id` = '0'");
-
-			$this->db->query("UPDATE " . DB_PREFIX . "product SET `status` = '1'");
-		}
-	}*/
-
 
 } // end class
 

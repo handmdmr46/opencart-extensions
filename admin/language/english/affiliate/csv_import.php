@@ -71,7 +71,8 @@ $_['button_edit_unlinked_products']    = 'Edit Unlinked Products';
 $_['button_clear_products']            = 'Clear Products';
 $_['button_edit_list']                 = 'Edit';
 $_['button_activate_linked_products']  = 'Activate Product Links';
-$_['button_set_ebay_profile']         =	'Save Profile';
+$_['button_set_ebay_profile']          = 'Save Profile';
+$_['button_clear'] 					   = 'Clear';
 
 // error
 $_['error']							   = 'ERROR: There was an error in your request, please try again';
@@ -92,13 +93,14 @@ $_['error_compatability_level']        = 'ERROR: eBay Compatability Level is req
 $_['error_ebay_call']                  = 'ERROR: The eBay call request has failed, timed out or your date interval has exceeded 121 days. Try decreasing your date range and re-send. If problem\'s persist contact the site administrator.';
 
 // success
-$_['success_delete']                   = 'Success: Product has been deleted.';
-$_['success_edit']                     = 'Success: Product edit has been saved.';
-$_['success_clear_dates']              = 'Success: Start to and start from eBay ItemID import dates have been cleared.';
-$_['success_profile']                  = 'Success: eBay developer profile has been saved.';
-$_['success_import']                   = 'Success: eBay product ID import has been completed.';
-$_['text_csv_success']                 = 'Success: CSV file has been parsed, preview product data below before submit.';
-$_['success_activate_product_links']   = 'Success: Linked products are now activated.';
+$_['success_delete']                   = 'SUCCESS: Product has been deleted.';
+$_['success_edit']                     = 'SUCCESS: Product edit has been saved.';
+$_['success_clear_dates']              = 'SUCCESS: Start to and start from eBay ItemID import dates have been cleared.';
+$_['success_profile']                  = 'SUCCESS: eBay developer profile has been saved.';
+$_['success_import']                   = 'SUCCESS: eBay product ID import has been completed.';
+$_['text_csv_success']                 = 'SUCCESS: CSV file has been parsed, preview product data below before submit.';
+$_['success_activate_product_links']   = 'SUCCESS: Linked products are now activated.';
+$_['success_clear'] 				   = 'SUCCESS: CSV Import table has been cleared.';
 
 // others
 $_['entry_select']                     = 'Please Select One';

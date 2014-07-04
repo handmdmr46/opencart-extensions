@@ -17,13 +17,12 @@
   <?php } ?>
 
   <div class="box">
-
     <div class="heading">
       <h1><img src="view/image/download.png" alt="" /> <?php echo $heading_title; ?></h1>
       <h1 class="wait" style="margin-left:1700px; display: none;">Please Wait, this may take awhile..... &nbsp;<img src="view/image/loading.gif" alt="" width="20" height="20" /></h1>
       <div class="buttons">
-        <a onclick="$('#form').attr('action', '<?php echo $link_product; ?>'); $('#form').submit(); startLoadingSpinner();" class="button"><?php echo $button_link_product; ?></a>
-        <a href="<?php echo $cancel; ?>" class="button"><?php echo $button_cancel; ?></a>
+        <a onclick="$('#form').attr('action', '<?php echo $link_product; ?>'); $('#form').submit(); startLoadingSpinner();" class="button" title="add product link yourself, be sure to enter the correct eBay ItemID"><?php echo $button_link_product; ?></a>
+        <a href="<?php echo $cancel; ?>" class="button" title="return to admin home"><?php echo $button_cancel; ?></a>
       </div>
     </div><!-- .heading -->
 
@@ -72,6 +71,10 @@
 
   function startLoadingSpinner(){
       $('.wait').show();
+  }
+
+  function check(id) {
+    document.getElementById(id + '_select').setAttribute('checked','checked');
   }
 
 //--></script>

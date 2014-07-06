@@ -238,23 +238,27 @@ class ControllerAffiliateStockControl extends Controller {
 			$this->redirect($this->url->link('affiliate/stock_control', 'token=' . $this->session->data['token'], 'SSL'));
 		}
 
-		if($this->request->post['ebay_call_name'] == 'getOrders') {
-			$this->getOrders();				
+		if($this->request->post['ebay_call_name'] == 'getOrders' && $this->request->server['REQUEST_METHOD'] == 'POST' && $this->validateEbayProfile() == 1) {
+			$this->session->data['getOrders'] = $this->model_affiliate_stock_control->getOrders();
+		    $this->session->data['success'] = $this->language->get('success_get_orders');			
     		$this->redirect($this->url->link('affiliate/stock_control', 'token=' . $this->session->data['token'], 'SSL'));
 		}
 
-		if($this->request->post['ebay_call_name'] == 'getItem') {
-			$this->getItem($this->request->post['item_id']);			
+		if($this->request->post['ebay_call_name'] == 'getItem' && $this->request->server['REQUEST_METHOD'] == 'POST' && $this->validateEbayProfile() == 1) {
+			// $this->session->data['getItemQuantity'] = $this->model_affiliate_stock_control->getItem($this->request->post['item_id']);	
+			// $this->session->data['getItemQuantity'] = $this->model_affiliate_stock_control->getProductQuantity($this->request->post['item_id']);
+			$this->session->data['getItemQuantity'] = $this->model_affiliate_stock_control->getEbayItemId($this->request->post['item_id']);
+			$this->session->data['success'] = $this->language->get('success_get_item');		
     		$this->redirect($this->url->link('affiliate/stock_control', 'token=' . $this->session->data['token'], 'SSL'));
 
 		}
 
-		if($this->request->post['ebay_call_name'] == 'endFixedPriceItem') {
+		if($this->request->post['ebay_call_name'] == 'endFixedPriceItem' && $this->request->server['REQUEST_METHOD'] == 'POST' && $this->validateEbayProfile() == 1) {
 			$this->endItem($this->request->post['item_id']);		
     		$this->redirect($this->url->link('affiliate/stock_control', 'token=' . $this->session->data['token'], 'SSL'));
 		}
 
-		if($this->request->post['ebay_call_name'] == 'reviseInventoryStatus') {
+		if($this->request->post['ebay_call_name'] == 'reviseInventoryStatus' && $this->request->server['REQUEST_METHOD'] == 'POST' && $this->validateEbayProfile() == 1) {
 			$this->session->data['success'] = $this->language->get('success_revise_item');
     		$this->redirect($this->url->link('affiliate/stock_control', 'token=' . $this->session->data['token'], 'SSL'));
 		}
@@ -290,12 +294,12 @@ class ControllerAffiliateStockControl extends Controller {
 	        $doc_response = new DomDocument();
 	        $doc_response->loadXML($xml_response);
 	        $message = $doc_response->getElementsByTagName('Ack')->item(0)->nodeValue;
-	        $severity_code = $doc_response->getElementsByTagName('SeverityCode')->item(0)->nodeValue;
-	        $error_code = $doc_response->getElementsByTagName('ErrorCode')->item(0)->nodeValue;
-	        $short_message = $doc_response->getElementsByTagName('ShortMessage')->item(0)->nodeValue;
-	        $long_message = $doc_response->getElementsByTagName('LongMessage')->item(0)->nodeValue;
-
+	        
 	        if($message == 'Failure') {
+	        	$severity_code = $doc_response->getElementsByTagName('SeverityCode')->item(0)->nodeValue;
+	        	$error_code = $doc_response->getElementsByTagName('ErrorCode')->item(0)->nodeValue;
+	        	$short_message = $doc_response->getElementsByTagName('ShortMessage')->item(0)->nodeValue;
+	        	$long_message = $doc_response->getElementsByTagName('LongMessage')->item(0)->nodeValue;
 		        $this->session->data['error'] = strtoupper($severity_code) . ': ' . $long_message . ' Error Code: ' . $error_code;
 		        $url = '';
 		        if (isset($this->request->get['page'])) {
@@ -344,12 +348,12 @@ class ControllerAffiliateStockControl extends Controller {
 	        $doc_response = new DomDocument();
 	        $doc_response->loadXML($xml_response);
 	        $message = $doc_response->getElementsByTagName('Ack')->item(0)->nodeValue;
-	        $severity_code = $doc_response->getElementsByTagName('SeverityCode')->item(0)->nodeValue;
-	        $error_code = $doc_response->getElementsByTagName('ErrorCode')->item(0)->nodeValue;
-	        $short_message = $doc_response->getElementsByTagName('ShortMessage')->item(0)->nodeValue;
-	        $long_message = $doc_response->getElementsByTagName('LongMessage')->item(0)->nodeValue;
-
+	        
 	        if($message == 'Failure') {
+	        	$severity_code = $doc_response->getElementsByTagName('SeverityCode')->item(0)->nodeValue;
+	        	$error_code = $doc_response->getElementsByTagName('ErrorCode')->item(0)->nodeValue;
+	        	$short_message = $doc_response->getElementsByTagName('ShortMessage')->item(0)->nodeValue;
+	        	$long_message = $doc_response->getElementsByTagName('LongMessage')->item(0)->nodeValue;
 		        $this->session->data['error'] = strtoupper($severity_code) . ': ' . $long_message . ' Error Code: ' . $error_code;
 		        $url = '';
 		        if (isset($this->request->get['page'])) {
@@ -364,205 +368,7 @@ class ControllerAffiliateStockControl extends Controller {
 
 	public function getItem($item_id) {
 		if ($this->request->server['REQUEST_METHOD'] == 'POST' && $this->validateEbayProfile() == 1) {
-			$call_name = 'getItem';
-			$ebay_call = new Ebaycall($this->request->post['developer_id'], $this->request->post['application_id'], $this->request->post['certification_id'], $this->request->post['compatability_level'], $this->request->post['site_id'], $call_name);
 			
-			$xml = '<?xml version="1.0" encoding="utf-8"?>';
-			$xml .= '<GetItemRequest xmlns="urn:ebay:apis:eBLBaseComponents">';
-			$xml .= '<RequesterCredentials>';
-			$xml .= '<eBayAuthToken>' . $this->request->post['user_token'] . '</eBayAuthToken>';
-			$xml .= '</RequesterCredentials>';
-			$xml .= '<ItemID>' . $item_id . '</ItemID>';
-			$xml .= '<WarningLevel>Low</WarningLevel>';
-            $xml .= '<OutputSelector>Title</OutputSelector>';
-            $xml .= '<OutputSelector>ItemID</OutputSelector>';
-            $xml .= '<OutputSelector>Quantity</OutputSelector>';
-	        $xml .= '</GetItemRequest>';
-
-	        $xml_response = $ebay_call->sendHttpRequest($xml);
-
-	        if(stristr($xml_response, 'HTTP 404') || $xml_response == '') {
-		        $this->session->data['error'] = $this->language->get('error_ebay_api_call');
-		        $url = '';
-		        if (isset($this->request->get['page'])) {
-		          $url .= '&page=' . $this->request->get['page'];
-		        }
-		        $this->redirect($this->url->link('affiliate/stock_control', 'token=' . $this->session->data['token'] . $url, 'SSL'));
-	        }
-
-	        $doc_response = new DomDocument();
-	        $doc_response->loadXML($xml_response);
-	        $message = $doc_response->getElementsByTagName('Ack')->item(0)->nodeValue;
-	        $severity_code = $doc_response->getElementsByTagName('SeverityCode')->item(0)->nodeValue;
-	        $error_code = $doc_response->getElementsByTagName('ErrorCode')->item(0)->nodeValue;
-	        $short_message = $doc_response->getElementsByTagName('ShortMessage')->item(0)->nodeValue;
-	        $long_message = $doc_response->getElementsByTagName('LongMessage')->item(0)->nodeValue;
-
-	        if($message == 'Failure') {
-		        $this->session->data['error'] = strtoupper($severity_code) . ': ' . $long_message . ' Error Code: ' . $error_code;
-		        $url = '';
-		        if (isset($this->request->get['page'])) {
-		          $url .= '&page=' . $this->request->get['page'];
-		        }
-		        $this->redirect($this->url->link('affiliate/stock_control', 'token=' . $this->session->data['token'] . $url, 'SSL'));
-	        }
-
-	        
-	        $title = $doc_response->getElementsByTagName('Title')->item(0)->nodeValue;
-	        $item_id = $doc_response->getElementsByTagName('ItemID')->item(0)->nodeValue;
-	        $quantity = $doc_response->getElementsByTagName('Quantity')->item(0)->nodeValue;	
-	        $this->session->data['getItem'] = array($title, $item_id, $quantity);
-
-	        $this->session->data['getItemTitle'] = $title;
-	        $this->session->data['getItemId'] = $item_id;
-	        $this->session->data['getItemQuantity'] = $quantity;
-	        $this->session->data['success'] = $this->language->get('success_get_item');
-		}
-	}
-
-	public function getOrders() {
-		if ($this->request->server['REQUEST_METHOD'] == 'POST' && $this->validateEbayProfile() == 1) {
-			$call_name = 'getOrders';
-			$ebay_call = new Ebaycall($this->request->post['developer_id'], $this->request->post['application_id'], $this->request->post['certification_id'], $this->request->post['compatability_level'], $this->request->post['site_id'], $call_name);
-			
-			$xml = '<?xml version="1.0" encoding="utf-8"?>';
-			$xml .= '<GetOrdersRequest xmlns="urn:ebay:apis:eBLBaseComponents">';
-			$xml .= '<RequesterCredentials>';
-			$xml .= '<eBayAuthToken>' . $this->request->post['user_token'] . '</eBayAuthToken>';
-			$xml .= '</RequesterCredentials>';
-			$xml .= '<Pagination ComplexType="PaginationType">';
-		    $xml .= '<EntriesPerPage>50</EntriesPerPage>';
-			$xml .= '<PageNumber>1</PageNumber>';
-			$xml .= '</Pagination>';			
-			$xml .= '<WarningLevel>Low</WarningLevel>';
-			$xml .= '<OutputSelector>PaginationResult</OutputSelector>';
-			$xml .= '<OutputSelector>OrderArray.Order.OrderID</OutputSelector>';
-			$xml .= '<OutputSelector>OrderArray.Order.TransactionArray.Transaction.Item.ItemID</OutputSelector>';
-			$xml .= '<OutputSelector>OrderArray.Order.TransactionArray.Transaction.Item.Title</OutputSelector>';
-			$xml .= '<OutputSelector>OrderArray.Order.TransactionArray.Transaction.QuantityPurchased</OutputSelector>';
-			$xml .= '<CreateTimeFrom>2014-06-10T01:00:00.000Z</CreateTimeFrom>';
-			$xml .= '<CreateTimeTo>2014-06-10T24:00:00.000Z</CreateTimeTo>';
-			$xml .= '<OrderRole>Seller</OrderRole>';
-			$xml .= '<OrderStatus>Completed</OrderStatus>';
-			$xml .= '</GetOrdersRequest>';
-
-			$xml_response = $ebay_call->sendHttpRequest($xml);
-
-			if(stristr($xml_response, 'HTTP 404') || $xml_response == '') {
-		        $this->session->data['error'] = $this->language->get('error_ebay_api_call');
-		        $url = '';
-		        if (isset($this->request->get['page'])) {
-		          $url .= '&page=' . $this->request->get['page'];
-		        }
-		        $this->redirect($this->url->link('affiliate/stock_control', 'token=' . $this->session->data['token'] . $url, 'SSL'));
-	        }
-
-	        $doc_response = new DomDocument();
-	        $doc_response->loadXML($xml_response);
-	        $message = $doc_response->getElementsByTagName('Ack')->item(0)->nodeValue;
-	        $severity_code = $doc_response->getElementsByTagName('SeverityCode')->item(0)->nodeValue;
-	        $error_code = $doc_response->getElementsByTagName('ErrorCode')->item(0)->nodeValue;
-	        $short_message = $doc_response->getElementsByTagName('ShortMessage')->item(0)->nodeValue;
-	        $long_message = $doc_response->getElementsByTagName('LongMessage')->item(0)->nodeValue;
-
-	        if($message == 'Failure') {
-		        $this->session->data['error'] = strtoupper($severity_code) . ': ' . $long_message . ' Error Code: ' . $error_code;
-		        $url = '';
-		        if (isset($this->request->get['page'])) {
-		          $url .= '&page=' . $this->request->get['page'];
-		        }
-		        $this->redirect($this->url->link('affiliate/stock_control', 'token=' . $this->session->data['token'] . $url, 'SSL'));
-	        }
-
-	        $titles = $doc_response->getElementsByTagName('Title');
-	        $item_ids = $doc_response->getElementsByTagName('ItemID');
-	        $qty_purchased = $doc_response->getElementsByTagName('QuantityPurchased');
-	        $total_pages = $doc_response->getElementsByTagName('TotalNumberOfPages');
-	        $page_count = intval($total_pages->item(0)->nodeValue);	        
-	        $import_data = array();
-
-	        foreach ($titles as $title) {
-	          $import_data['title'][] = $title->nodeValue;
-	        }
-
-	        foreach ($item_ids as $item_id) {
-	          $import_data['id'][] = $item_id->nodeValue;
-	        }
-
-	        foreach ($qty_purchased as $qty) {
-	        	$import_data['qty_purchased'][] = $qty->nodeValue;
-	        }
-
-	        if($page_count > 1) {
-	        	for($i = 2; $i <= $page_count; $i++) {
-	        		$ebay_call = new Ebaycall($this->request->post['developer_id'], $this->request->post['application_id'], $this->request->post['certification_id'], $this->request->post['compatability_level'], $this->request->post['site_id'], $call_name);
-	        		
-	        		$xml = '<?xml version="1.0" encoding="utf-8"?>';
-					$xml .= '<GetOrdersRequest xmlns="urn:ebay:apis:eBLBaseComponents">';
-					$xml .= '<RequesterCredentials>';
-					$xml .= '<eBayAuthToken>' . $this->request->post['user_token'] . '</eBayAuthToken>';
-					$xml .= '</RequesterCredentials>';
-					$xml .= '<Pagination ComplexType="PaginationType">';
-				    $xml .= '<EntriesPerPage>50</EntriesPerPage>';
-					$xml .= '<PageNumber>' . $i . '</PageNumber>';
-					$xml .= '</Pagination>';
-					$xml .= '<DetailLevel>ReturnAll</DetailLevel>';
-					$xml .= '<WarningLevel>Low</WarningLevel>';
-					$xml .= '<OutputSelector>PaginationResult</OutputSelector>';
-					$xml .= '<OutputSelector>OrderArray.Order.OrderID</OutputSelector>';
-					$xml .= '<OutputSelector>OrderArray.Order.TransactionArray.Transaction.Item.ItemID</OutputSelector>';
-					$xml .= '<OutputSelector>OrderArray.Order.TransactionArray.Transaction.Item.Title</OutputSelector>';
-					$xml .= '<OutputSelector>OrderArray.Order.TransactionArray.Transaction.QuantityPurchased</OutputSelector>';
-					$xml .= '<CreateTimeFrom>2014-06-10T01:00:00.000Z</CreateTimeFrom>';
-					$xml .= '<CreateTimeTo>2014-06-10T24:00:00.000Z</CreateTimeTo>';
-					$xml .= '<OrderRole>Seller</OrderRole>';
-					$xml .= '<OrderStatus>Completed</OrderStatus>';
-					$xml .= '</GetOrdersRequest>';
-
-					$xml_response = $ebay_call->sendHttpRequest($xml);
-
-					if(stristr($xml_response, 'HTTP 404') || $xml_response == '') {
-				        $this->session->data['error'] = $this->language->get('error_ebay_api_call');
-				        $url = '';
-				        if (isset($this->request->get['page'])) {
-				          $url .= '&page=' . $this->request->get['page'];
-				        }
-				        $this->redirect($this->url->link('affiliate/stock_control', 'token=' . $this->session->data['token'] . $url, 'SSL'));
-			        }
-
-			        $doc_response = new DomDocument();
-			        $doc_response->loadXML($xml_response);
-			        $message = $doc_response->getElementsByTagName('Ack')->item(0)->nodeValue;
-	        		$severity_code = $doc_response->getElementsByTagName('SeverityCode')->item(0)->nodeValue;
-	        		$error_code = $doc_response->getElementsByTagName('ErrorCode')->item(0)->nodeValue;
-	        		$short_message = $doc_response->getElementsByTagName('ShortMessage')->item(0)->nodeValue;
-	        		$long_message = $doc_response->getElementsByTagName('LongMessage')->item(0)->nodeValue;
-
-	        		if($message == 'Failure') {
-				        $this->session->data['error'] = strtoupper($severity_code) . ': ' . $long_message . ' Error Code: ' . $error_code;
-				        $url = '';
-				        if (isset($this->request->get['page'])) {
-				          $url .= '&page=' . $this->request->get['page'];
-				        }
-				        $this->redirect($this->url->link('affiliate/stock_control', 'token=' . $this->session->data['token'] . $url, 'SSL'));
-			        }
-
-			        foreach ($titles as $title) {
-	             		$import_data['title'][] = $title->nodeValue;
-	        		}
-
-			        foreach ($item_ids as $item_id) {
-			          	$import_data['id'][] = $item_id->nodeValue;
-			        }
-
-			        foreach ($quantity_purchased as $quantity) {
-			        	$import_data['quantity_purchased'][] = $quantity->nodeValue;
-			        }				        		        
-			    }
-		    }
-		    
-		    $this->session->data['getOrders'] = $import_data;	
-		    $this->session->data['success'] = $this->language->get('success_get_orders');		    		    
 		}
 	}
 

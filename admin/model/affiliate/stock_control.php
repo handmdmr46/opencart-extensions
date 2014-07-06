@@ -142,5 +142,275 @@ class ModelAffiliateStockControl extends Model {
 		$this->db->query("DELETE FROM " . DB_PREFIX . "ebay_listing WHERE product_id = '" . $this->db->escape($product_id) . "'");
 	}
 
+	public function getOrders() {
+		$call_name = 'getOrders';
+		$profile = $this->getEbayProfile();
+		$ebay_call = new Ebaycall($profile['developer_id'], $profile['application_id'], $profile['certification_id'], $profile['compat'], $profile['site_id'], $call_name);
+		
+		$xml = '<?xml version="1.0" encoding="utf-8"?>';
+		$xml .= '<GetOrdersRequest xmlns="urn:ebay:apis:eBLBaseComponents">';
+		$xml .= '<RequesterCredentials>';
+		$xml .= '<eBayAuthToken>' . $profile['user_token'] . '</eBayAuthToken>';
+		$xml .= '</RequesterCredentials>';
+		$xml .= '<Pagination ComplexType="PaginationType">';
+	    $xml .= '<EntriesPerPage>50</EntriesPerPage>';
+		$xml .= '<PageNumber>1</PageNumber>';
+		$xml .= '</Pagination>';			
+		$xml .= '<WarningLevel>Low</WarningLevel>';
+		$xml .= '<OutputSelector>PaginationResult</OutputSelector>';
+		$xml .= '<OutputSelector>OrderArray.Order.OrderID</OutputSelector>';
+		$xml .= '<OutputSelector>OrderArray.Order.TransactionArray.Transaction.Item.ItemID</OutputSelector>';
+		$xml .= '<OutputSelector>OrderArray.Order.TransactionArray.Transaction.Item.Title</OutputSelector>';
+		$xml .= '<OutputSelector>OrderArray.Order.TransactionArray.Transaction.QuantityPurchased</OutputSelector>';
+		$xml .= '<CreateTimeFrom>2014-06-10T01:00:00.000Z</CreateTimeFrom>';
+		$xml .= '<CreateTimeTo>2014-06-10T24:00:00.000Z</CreateTimeTo>';
+		$xml .= '<OrderRole>Seller</OrderRole>';
+		$xml .= '<OrderStatus>Completed</OrderStatus>';
+		$xml .= '</GetOrdersRequest>';
+
+		$xml_response = $ebay_call->sendHttpRequest($xml);
+
+		if(stristr($xml_response, 'HTTP 404') || $xml_response == '') {
+			$this->language->load('affiliate/stock_control');
+	        $response = $this->language->get('error_ebay_api_call');
+	        return $response;
+        }
+
+        $doc_response = new DomDocument();
+        $doc_response->loadXML($xml_response);
+        $message = $doc_response->getElementsByTagName('Ack')->item(0)->nodeValue;
+        
+
+        if($message == 'Failure') {
+        	$severity_code = $doc_response->getElementsByTagName('SeverityCode')->item(0)->nodeValue;
+        	$error_code = $doc_response->getElementsByTagName('ErrorCode')->item(0)->nodeValue;
+        	$short_message = $doc_response->getElementsByTagName('ShortMessage')->item(0)->nodeValue;
+        	$long_message = $doc_response->getElementsByTagName('LongMessage')->item(0)->nodeValue;
+	        $response = strtoupper($severity_code) . ': ' . $long_message . ' Error Code: ' . $error_code;
+			return $response;
+        }
+
+        $titles = $doc_response->getElementsByTagName('Title');
+        $item_ids = $doc_response->getElementsByTagName('ItemID');
+        $qty_purchased = $doc_response->getElementsByTagName('QuantityPurchased');
+        $total_pages = $doc_response->getElementsByTagName('TotalNumberOfPages');
+        $page_count = intval($total_pages->item(0)->nodeValue);	        
+        $import_data = array();
+
+        foreach ($titles as $title) {
+          $import_data['title'][] = $title->nodeValue;
+        }
+
+        foreach ($item_ids as $item_id) {
+          $import_data['id'][] = $item_id->nodeValue;
+        }
+
+        foreach ($qty_purchased as $qty) {
+        	$import_data['qty_purchased'][] = $qty->nodeValue;
+        }
+
+        if($page_count > 1) {
+        	for($i = 2; $i <= $page_count; $i++) {
+        		$ebay_call = new Ebaycall($profile['developer_id'], $profile['application_id'], $profile['certification_id'], $profile['compatability_level'], $profile['site_id'], $call_name);
+        		
+        		$xml = '<?xml version="1.0" encoding="utf-8"?>';
+				$xml .= '<GetOrdersRequest xmlns="urn:ebay:apis:eBLBaseComponents">';
+				$xml .= '<RequesterCredentials>';
+				$xml .= '<eBayAuthToken>' . $profile['user_token'] . '</eBayAuthToken>';
+				$xml .= '</RequesterCredentials>';
+				$xml .= '<Pagination ComplexType="PaginationType">';
+			    $xml .= '<EntriesPerPage>50</EntriesPerPage>';
+				$xml .= '<PageNumber>' . $i . '</PageNumber>';
+				$xml .= '</Pagination>';
+				$xml .= '<DetailLevel>ReturnAll</DetailLevel>';
+				$xml .= '<WarningLevel>Low</WarningLevel>';
+				$xml .= '<OutputSelector>PaginationResult</OutputSelector>';
+				$xml .= '<OutputSelector>OrderArray.Order.OrderID</OutputSelector>';
+				$xml .= '<OutputSelector>OrderArray.Order.TransactionArray.Transaction.Item.ItemID</OutputSelector>';
+				$xml .= '<OutputSelector>OrderArray.Order.TransactionArray.Transaction.Item.Title</OutputSelector>';
+				$xml .= '<OutputSelector>OrderArray.Order.TransactionArray.Transaction.QuantityPurchased</OutputSelector>';
+				$xml .= '<CreateTimeFrom>2014-06-10T01:00:00.000Z</CreateTimeFrom>';
+				$xml .= '<CreateTimeTo>2014-06-10T24:00:00.000Z</CreateTimeTo>';
+				$xml .= '<OrderRole>Seller</OrderRole>';
+				$xml .= '<OrderStatus>Completed</OrderStatus>';
+				$xml .= '</GetOrdersRequest>';
+
+				$xml_response = $ebay_call->sendHttpRequest($xml);
+
+				if(stristr($xml_response, 'HTTP 404') || $xml_response == '') {
+				   $this->language->load('affiliate/stock_control');
+	     		   $response = $this->language->get('error_ebay_api_call');
+	        	   return $response;
+        		}	
+
+		        $doc_response = new DomDocument();
+		        $doc_response->loadXML($xml_response);
+		        $message = $doc_response->getElementsByTagName('Ack')->item(0)->nodeValue;
+        		
+        		if($message == 'Failure') {
+        			$severity_code = $doc_response->getElementsByTagName('SeverityCode')->item(0)->nodeValue;
+        			$error_code = $doc_response->getElementsByTagName('ErrorCode')->item(0)->nodeValue;
+        			$short_message = $doc_response->getElementsByTagName('ShortMessage')->item(0)->nodeValue;
+        			$long_message = $doc_response->getElementsByTagName('LongMessage')->item(0)->nodeValue;
+	        		$response = strtoupper($severity_code) . ': ' . $long_message . ' Error Code: ' . $error_code;
+					return $response;
+        		}
+
+		        foreach ($titles as $title) {
+             		$import_data['title'][] = $title->nodeValue;
+        		}
+
+		        foreach ($item_ids as $item_id) {
+		          	$import_data['id'][] = $item_id->nodeValue;
+		        }
+
+		        foreach ($quantity_purchased as $quantity) {
+		        	$import_data['quantity_purchased'][] = $quantity->nodeValue;
+		        }				        		        
+		    }
+	    }
+
+	    return $import_data;
+	}
+
+	public function getEbayItemQuantity($ebay_item_id) {
+		$call_name = 'getItem';
+		$profile = $this->getEbayProfile();
+		$ebay_call = new Ebaycall($profile['developer_id'], $profile['application_id'], $profile['certification_id'], $profile['compat'], $profile['site_id'], $call_name);
+		
+		$xml = '<?xml version="1.0" encoding="utf-8"?>';
+		$xml .= '<GetItemRequest xmlns="urn:ebay:apis:eBLBaseComponents">';
+		$xml .= '<RequesterCredentials>';
+		$xml .= '<eBayAuthToken>' . $profile['user_token'] . '</eBayAuthToken>';
+		$xml .= '</RequesterCredentials>';
+		$xml .= '<ItemID>' . $ebay_item_id . '</ItemID>';
+		$xml .= '<WarningLevel>Low</WarningLevel>';
+        $xml .= '<OutputSelector>Title</OutputSelector>';
+        $xml .= '<OutputSelector>ItemID</OutputSelector>';
+        $xml .= '<OutputSelector>Quantity</OutputSelector>';
+        $xml .= '</GetItemRequest>';
+
+        $xml_response = $ebay_call->sendHttpRequest($xml);
+
+        if(stristr($xml_response, 'HTTP 404') || $xml_response == '') {
+        	$this->language->load('affiliate/stock_control');
+	        $response = $this->language->get('error_ebay_api_call');
+	        return $response;
+        }
+
+        $doc_response = new DomDocument();
+        $doc_response->loadXML($xml_response);
+        $message = $doc_response->getElementsByTagName('Ack')->item(0)->nodeValue;
+        
+        if($message == 'Failure') {
+        	$severity_code = $doc_response->getElementsByTagName('SeverityCode')->item(0)->nodeValue;
+        	$error_code = $doc_response->getElementsByTagName('ErrorCode')->item(0)->nodeValue;
+        	$short_message = $doc_response->getElementsByTagName('ShortMessage')->item(0)->nodeValue;
+        	$long_message = $doc_response->getElementsByTagName('LongMessage')->item(0)->nodeValue;
+	        $response = strtoupper($severity_code) . ': ' . $long_message . ' Error Code: ' . $error_code;
+			return $response;
+        }
+        
+        $quantity = $doc_response->getElementsByTagName('Quantity')->item(0)->nodeValue;	
+        return $quantity;
+	}
+
+	public function getProductQuantity($product_id) {
+		$product_quantity = $this->db->query("SELECT quantity FROM " . DB_PREFIX . "product WHERE product_id = '" . (int)$product_id . "'");
+		return $product_quantity->row['quantity'];
+	}
+
+	public function getEbayItemId($product_id) {
+		$ebay_item_id = $this->db->query("SELECT ebay_item_id FROM " . DB_PREFIX . "ebay_listing WHERE product_id = '" . (int)$product_id . "'");
+		return $ebay_item_id->row['ebay_item_id'];
+	}
+
+	public function reviseEbayItemQuantity($ebay_item_id, $new_quantity) {
+		$call_name = 'reviseInventoryStatus';
+		$profile = $this->getEbayProfile();
+		$ebay_call = new Ebaycall($profile['developer_id'], $profile['application_id'], $profile['certification_id'], $profile['compatability_level'], $profile['site_id'], $call_name);
+
+		$xml = '<?xml version="1.0" encoding="utf-8"?>';
+		$xml .= '<ReviseInventoryStatusRequest xmlns="urn:ebay:apis:eBLBaseComponents">';
+		$xml .= '<RequesterCredentials>';
+		$xml .= '<eBayAuthToken>' . $profile['user_token'] . '</eBayAuthToken>';
+		$xml .= '</RequesterCredentials>';
+		$xml .= '<WarningLevel>Low</WarningLevel>';
+		$xml .= '<InventoryStatus>';
+		$xml .= '<ItemID>' . $ebay_item_id . '</ItemID>';
+		$xml .= '<Quantity>' . $new_quantity . '</Quantity>';
+		$xml .= '</InventoryStatus>';
+		$xml .= '</ReviseInventoryStatusRequest>';
+
+		$xml_response = $ebay_call->sendHttpRequest($xml);
+
+		$ebay_call_response = '';
+
+        if(stristr($xml_response, 'HTTP 404') || $xml_response == '') {
+	        $this->language->load('affiliate/stock_control');
+	        $ebay_call_response = $this->language->get('error_ebay_api_call');	        
+        }
+
+        $doc_response = new DomDocument();
+        $doc_response->loadXML($xml_response);
+        $message = $doc_response->getElementsByTagName('Ack')->item(0)->nodeValue;                
+
+        if($message == 'Failure') {
+        	$severity_code = $doc_response->getElementsByTagName('SeverityCode')->item(0)->nodeValue;
+        	$error_code = $doc_response->getElementsByTagName('ErrorCode')->item(0)->nodeValue;
+        	$short_message = $doc_response->getElementsByTagName('ShortMessage')->item(0)->nodeValue;
+        	$long_message = $doc_response->getElementsByTagName('LongMessage')->item(0)->nodeValue;
+	        $ebay_call_response = strtoupper($severity_code) . ': ' . $long_message . ' Error Code: ' . $error_code;	        
+        }
+
+        if($message == 'Success') {
+        	$ebay_call_response = $doc_response->getElementsByTagName('Timestamp')->item(0)->nodeValue;
+        }
+
+        return $ebay_call_response;
+	}
+
+	public function endEbayItem($ebay_item_id) {
+		$call_name = 'endFixedPriceItem';
+		$profile = $this->getEbayProfile();
+		$ebay_call = new Ebaycall($profile['developer_id'], $profile['application_id'], $profile['certification_id'], $profile['compatability_level'], $profile['site_id'], $call_name);
+
+		$xml = '<?xml version="1.0" encoding="utf-8"?>';
+		$xml .= '<EndFixedPriceItemRequest xmlns="urn:ebay:apis:eBLBaseComponents">';
+		$xml .= '<ItemID>' . $ebay_item_id . '</ItemID>';
+		$xml .= '<EndingReason EnumType="EndReasonCodeType">NotAvailable</EndingReason>';
+		$xml .= '<RequesterCredentials>';
+		$xml .= '<eBayAuthToken>' . $profile['user_token'] . '</eBayAuthToken>';
+		$xml .= '</RequesterCredentials>';
+		$xml .= '</EndFixedPriceItemRequest>';
+
+		$xml_response = $ebay_call->sendHttpRequest($xml);
+
+		$ebay_call_response = '';
+
+        if(stristr($xml_response, 'HTTP 404') || $xml_response == '') {
+	        $this->language->load('affiliate/stock_control');
+	        $ebay_call_response = $this->language->get('error_ebay_api_call');	        
+        }
+
+        $doc_response = new DomDocument();
+        $doc_response->loadXML($xml_response);
+        $message = $doc_response->getElementsByTagName('Ack')->item(0)->nodeValue;                
+
+        if($message == 'Failure') {
+        	$severity_code = $doc_response->getElementsByTagName('SeverityCode')->item(0)->nodeValue;
+        	$error_code = $doc_response->getElementsByTagName('ErrorCode')->item(0)->nodeValue;
+        	$short_message = $doc_response->getElementsByTagName('ShortMessage')->item(0)->nodeValue;
+        	$long_message = $doc_response->getElementsByTagName('LongMessage')->item(0)->nodeValue;
+	        $ebay_call_response = strtoupper($severity_code) . ': ' . $long_message . ' Error Code: ' . $error_code;	        
+        }
+
+        if($message == 'Success') {
+        	$ebay_call_response = $doc_response->getElementsByTagName('Timestamp')->item(0)->nodeValue;
+        }
+
+        return $ebay_call_response;
+	}
+
 } // end class
 ?>

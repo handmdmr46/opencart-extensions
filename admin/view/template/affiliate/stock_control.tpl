@@ -170,19 +170,19 @@
 		 			 </td></tr>
 		        <?php } ?>
 
-		        <?php if ($getItem) { ?>
+		        <?php //if ($getItem) { ?>
 		        	<tr><td style="width:500px;">
 		        	<?php 
-		        		foreach($getItem as $item) { 
-		        			echo $item . '<br>';
-		        		}
-		        		echo $getItemTitle;
-		        		echo $getItemId;
+		        		// foreach($getItem as $item) { 
+		        		// 	echo $item . '<br>';
+		        		// }
+		        		// echo $getItemTitle;
+		        		// echo $getItemId;
 		        		echo $getItemQuantity;
 
 		        	?>
 		        	</td></tr>
-				<?php } ?>		      
+				<?php //} ?>		      
 		      </table>
 		  </form>
         </div><!-- .content -->

@@ -199,3 +199,7 @@ AFTER       `category_id`;
 ALTER TABLE `db_ebay_listing`
 ADD COLUMN  `affiliate_id` int(11) NOT NULL DEFAULT'0'
 AFTER       `status`;
+
+ALTER TABLE `db_order_product`
+ADD COLUMN  `ebay_response` varchar(100) NOT NULL DEFAULT'no response'
+AFTER       `affiliate_order`;

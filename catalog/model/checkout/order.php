@@ -75,6 +75,40 @@ class ModelCheckoutOrder extends Model {
  
 			$order_product_id = $this->db->getLastId();
 
+			############################################
+			############# STOCK CONTROL ################
+			############################################
+			$product_quantity = $this->getProductQuantity($order_product['product_id']);
+			$ebay_item_id = $this->getEbayItemId($order_product['product_id']);
+			$ebay_item_quantity = $this->getEbayItemQuantity($ebay_item_id);
+			$new_ebay_item_quantity = $product_quantity - $ebay_item_quantity;
+
+			$ebay_response = 'FAILED REQUEST - Please adjust your stock manually for this item';
+
+			// ebay item stock control
+			if(is_numeric($ebay_item_quantity) && $new_ebay_item_quantity < 1) {
+				$ebay_response = 'EBAY ITEM ENDED: ' . $ebay_item_id . ' ';
+				$ebay_response .= $this->endEbayItem($ebay_item_id);
+			}
+
+			if(is_numeric($ebay_item_quantity) && $new_ebay_item_quantity > 1) {
+				$ebay_response = 'REVISED EBAY ITEM QUANTITY: ' . $ebay_item_id . ' ';
+				$ebay_response .= $this->reviseEbayItemQuantity($ebay_item_id, $new_ebay_item_quantity);
+			}
+
+			// add eBay response to db
+			$this->db->query("UPDATE " . DB_PREFIX . "order_product SET ebay_response = '" . $this->db->escape($ebay_response) . "' WHERE order_id = '" . (int)$order_id . "' AND product_id = '" . (int)$order_product['product_id'] . "'");
+			
+			// adjust product quantity
+			$this->db->query("UPDATE " . DB_PREFIX . "product SET quantity = (quantity - " . (int)$order_product['quantity'] . ") WHERE product_id = '" . (int)$order_product['product_id'] . "' AND subtract = '1'");
+			
+			// set product status
+			if($this->getProductQuantity($order_product['product_id']) < 1) {
+				$this->db->query("UPDATE " . DB_PREFIX . "product SET status = '0' WHERE product_id = '" . (int)$order_product['product_id'] . "'");
+				$ebay_response .= ' Product Status: Not Active (0) ';
+			}
+
+			// Product option
 			foreach ($product['option'] as $option) {
 				$this->db->query("INSERT INTO " . DB_PREFIX . "order_option 
 									SET order_id = '" . (int)$order_id . "', 
@@ -85,7 +119,8 @@ class ModelCheckoutOrder extends Model {
 										`value` = '" . $this->db->escape($option['value']) . "', 
 										`type` = '" . $this->db->escape($option['type']) . "'");
 			}
-				
+			
+			// Product download	
 			foreach ($product['download'] as $download) {
 				$this->db->query("INSERT INTO " . DB_PREFIX . "order_download 
 									SET order_id = '" . (int)$order_id . "', 
@@ -97,6 +132,7 @@ class ModelCheckoutOrder extends Model {
 			}	
 		}
 		
+		// Vouchers
 		foreach ($data['vouchers'] as $voucher) {
 			$this->db->query("INSERT INTO " . DB_PREFIX . "order_voucher 
 								SET order_id = '" . (int)$order_id . "', 
@@ -110,7 +146,8 @@ class ModelCheckoutOrder extends Model {
 									message = '" . $this->db->escape($voucher['message']) . "', 
 									amount = '" . (float)$voucher['amount'] . "'");
 		}
-			
+		
+		// Totals	
 		foreach ($data['totals'] as $total) {
 			$this->db->query("INSERT INTO " . DB_PREFIX . "order_total 
 								SET order_id = '" . (int)$order_id . "', 
@@ -767,5 +804,152 @@ class ModelCheckoutOrder extends Model {
 			}
 		}
 	}
-}
+
+	public function reviseEbayItemQuantity($ebay_item_id, $new_quantity) {
+		$call_name = 'reviseInventoryStatus';
+		$this->load->model('affiliate/stock_control');
+		$profile = $this->model_affiliate_stock_control->getEbayProfile();
+		$ebay_call = new Ebaycall($profile['developer_id'], $profile['application_id'], $profile['certification_id'], $profile['compat'], $profile['site_id'], $call_name);
+
+		$xml = '<?xml version="1.0" encoding="utf-8"?>';
+		$xml .= '<ReviseInventoryStatusRequest xmlns="urn:ebay:apis:eBLBaseComponents">';
+		$xml .= '<RequesterCredentials>';
+		$xml .= '<eBayAuthToken>' . $profile['user_token'] . '</eBayAuthToken>';
+		$xml .= '</RequesterCredentials>';
+		$xml .= '<WarningLevel>Low</WarningLevel>';
+		$xml .= '<InventoryStatus>';
+		$xml .= '<ItemID>' . $ebay_item_id . '</ItemID>';
+		$xml .= '<Quantity>' . $new_quantity . '</Quantity>';
+		$xml .= '</InventoryStatus>';
+		$xml .= '</ReviseInventoryStatusRequest>';
+
+		$xml_response = $ebay_call->sendHttpRequest($xml);
+
+		$ebay_call_response = '';
+
+        if(stristr($xml_response, 'HTTP 404') || $xml_response == '') {
+	        $this->language->load('affiliate/stock_control');
+	        $ebay_call_response = $this->language->get('error_ebay_api_call');	        
+        }
+
+        $doc_response = new DomDocument();
+        $doc_response->loadXML($xml_response);
+        $message = $doc_response->getElementsByTagName('Ack')->item(0)->nodeValue;                
+
+        if($message == 'Failure') {
+        	$severity_code = $doc_response->getElementsByTagName('SeverityCode')->item(0)->nodeValue;
+        	$error_code = $doc_response->getElementsByTagName('ErrorCode')->item(0)->nodeValue;
+        	$short_message = $doc_response->getElementsByTagName('ShortMessage')->item(0)->nodeValue;
+        	$long_message = $doc_response->getElementsByTagName('LongMessage')->item(0)->nodeValue;
+        	$ebay_call_response = 'FAILURE: ';
+	        $ebay_call_response .= strtoupper($severity_code) . ': ' . $long_message . ' Error Code: ' . $error_code;	        
+        }
+
+        if($message == 'Success') {
+        	$ebay_call_response = 'SUCCESS: Timestamp=';
+        	$ebay_call_response .= $doc_response->getElementsByTagName('Timestamp')->item(0)->nodeValue;
+        }
+
+        return $ebay_call_response;
+	}
+
+	public function endEbayItem($ebay_item_id) {
+		$call_name = 'endFixedPriceItem';
+		$this->load->model('affiliate/stock_control');
+		$profile = $this->model_affiliate_stock_control->getEbayProfile();
+		$ebay_call = new Ebaycall($profile['developer_id'], $profile['application_id'], $profile['certification_id'], $profile['compat'], $profile['site_id'], $call_name);
+
+		$xml = '<?xml version="1.0" encoding="utf-8"?>';
+		$xml .= '<EndFixedPriceItemRequest xmlns="urn:ebay:apis:eBLBaseComponents">';
+		$xml .= '<ItemID>' . $ebay_item_id . '</ItemID>';
+		$xml .= '<EndingReason EnumType="EndReasonCodeType">NotAvailable</EndingReason>';
+		$xml .= '<RequesterCredentials>';
+		$xml .= '<eBayAuthToken>' . $profile['user_token'] . '</eBayAuthToken>';
+		$xml .= '</RequesterCredentials>';
+		$xml .= '</EndFixedPriceItemRequest>';
+
+		$xml_response = $ebay_call->sendHttpRequest($xml);
+
+		$ebay_call_response = '';
+
+        if(stristr($xml_response, 'HTTP 404') || $xml_response == '') {
+	        $this->language->load('affiliate/stock_control');
+	        $ebay_call_response = $this->language->get('error_ebay_api_call');	        
+        }
+
+        $doc_response = new DomDocument();
+        $doc_response->loadXML($xml_response);
+        $message = $doc_response->getElementsByTagName('Ack')->item(0)->nodeValue;                
+
+        if($message == 'Failure') {
+        	$severity_code = $doc_response->getElementsByTagName('SeverityCode')->item(0)->nodeValue;
+        	$error_code = $doc_response->getElementsByTagName('ErrorCode')->item(0)->nodeValue;
+        	$short_message = $doc_response->getElementsByTagName('ShortMessage')->item(0)->nodeValue;
+        	$long_message = $doc_response->getElementsByTagName('LongMessage')->item(0)->nodeValue;
+        	$ebay_call_response = 'FAILURE: ';
+	        $ebay_call_response .= strtoupper($severity_code) . ': ' . $long_message . ' Error Code: ' . $error_code;	        
+        }
+
+        if($message == 'Success') {
+        	$ebay_call_response = 'SUCCESS: Timestamp=';
+        	$ebay_call_response .= $doc_response->getElementsByTagName('Timestamp')->item(0)->nodeValue;
+        }
+
+        return $ebay_call_response;
+	}
+
+	public function getEbayItemQuantity($ebay_item_id) {
+		$call_name = 'getItem';
+		$this->load->model('affiliate/stock_control');
+		$profile = $this->model_affiliate_stock_control->getEbayProfile();
+		$ebay_call = new Ebaycall($profile['developer_id'], $profile['application_id'], $profile['certification_id'], $profile['compat'], $profile['site_id'], $call_name);
+		
+		$xml = '<?xml version="1.0" encoding="utf-8"?>';
+		$xml .= '<GetItemRequest xmlns="urn:ebay:apis:eBLBaseComponents">';
+		$xml .= '<RequesterCredentials>';
+		$xml .= '<eBayAuthToken>' . $profile['user_token'] . '</eBayAuthToken>';
+		$xml .= '</RequesterCredentials>';
+		$xml .= '<ItemID>' . $ebay_item_id . '</ItemID>';
+		$xml .= '<WarningLevel>Low</WarningLevel>';
+        $xml .= '<OutputSelector>Title</OutputSelector>';
+        $xml .= '<OutputSelector>ItemID</OutputSelector>';
+        $xml .= '<OutputSelector>Quantity</OutputSelector>';
+        $xml .= '</GetItemRequest>';
+
+        $xml_response = $ebay_call->sendHttpRequest($xml);
+
+        if(stristr($xml_response, 'HTTP 404') || $xml_response == '') {
+        	$this->language->load('affiliate/stock_control');
+	        $response = $this->language->get('error_ebay_api_call');
+	        return $response;
+        }
+
+        $doc_response = new DomDocument();
+        $doc_response->loadXML($xml_response);
+        $message = $doc_response->getElementsByTagName('Ack')->item(0)->nodeValue;
+        
+        if($message == 'Failure') {
+        	$severity_code = $doc_response->getElementsByTagName('SeverityCode')->item(0)->nodeValue;
+        	$error_code = $doc_response->getElementsByTagName('ErrorCode')->item(0)->nodeValue;
+        	$short_message = $doc_response->getElementsByTagName('ShortMessage')->item(0)->nodeValue;
+        	$long_message = $doc_response->getElementsByTagName('LongMessage')->item(0)->nodeValue;
+	        $response = strtoupper($severity_code) . ': ' . $long_message . ' Error Code: ' . $error_code;
+			return $response;
+        }
+        
+        $quantity = $doc_response->getElementsByTagName('Quantity')->item(0)->nodeValue;	
+        return $quantity;
+	}
+
+	public function getProductQuantity($product_id) {
+		$product_quantity = $this->db->query("SELECT quantity FROM " . DB_PREFIX . "product WHERE product_id = '" . (int)$product_id . "'");
+		return $product_quantity->row['quantity'];
+	}
+
+	public function getEbayItemId($product_id) {
+		$ebay_item_id = $this->db->query("SELECT ebay_item_id FROM " . DB_PREFIX . "ebay_listing WHERE product_id = '" . (int)$product_id . "'");
+		return $ebay_item_id->row['ebay_item_id'];
+	}
+
+}// end class
 ?>

@@ -132,13 +132,13 @@ class ModelAffiliateStockControl extends Model {
 
 	public function setProductLink($product_id, $ebay_id) {
 		if (isset($ebay_id) ) {
-			$this->db->query("UPDATE " . DB_PREFIX . "product SET linked = 1 WHERE product_id = '" . $this->db->escape($product_id) . "'");
+			$this->db->query("UPDATE " . DB_PREFIX . "product SET linked = 1, status = 1 WHERE product_id = '" . $this->db->escape($product_id) . "'");
 			$this->db->query("INSERT INTO " . DB_PREFIX . "ebay_listing SET ebay_item_id = '" . $this->db->escape($ebay_id) . "', product_id = '" . $this->db->escape($product_id) . "', affiliate_id = '0'");
 		}
 	}
 
 	public function removeProductLink($product_id) {
-		$this->db->query("UPDATE " . DB_PREFIX . "product SET linked = 0 WHERE product_id = '" . $this->db->escape($product_id) . "'");
+		$this->db->query("UPDATE " . DB_PREFIX . "product SET linked = 0, status = 0 WHERE product_id = '" . $this->db->escape($product_id) . "'");
 		$this->db->query("DELETE FROM " . DB_PREFIX . "ebay_listing WHERE product_id = '" . $this->db->escape($product_id) . "'");
 	}
 

@@ -174,6 +174,7 @@ $_['entry_coupon']                            = 'Coupon:';
 $_['entry_voucher']                           = 'Voucher:';
 $_['entry_reward']                            = 'Reward:';
 
+
 // Error
 $_['error_warning']                           = 'Warning: Please check the form carefully for errors!';
 $_['error_permission']                        = 'Warning: You do not have permission to modify orders!';

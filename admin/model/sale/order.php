@@ -160,15 +160,15 @@ class ModelSaleOrder extends Model {
 				$ebay_response = 'FAILED REQUEST - Please adjust your stock manually for this item';
 
 				// ebay item stock control
-				if(is_numeric($ebay_item_quantity) && $new_ebay_item_quantity < 1) {
-					$ebay_response = 'EBAY ITEM ENDED: ' . $ebay_item_id . ' ';
-					$ebay_response .= $this->endEbayItem($ebay_item_id);
-				}
+			if(is_numeric($ebay_item_quantity) && $new_ebay_item_quantity < 1) {
+				$ebay_response = 'EBAY ITEM ENDED - ItemID: ' . $ebay_item_id . ' - Response:';
+				$ebay_response .= $this->endEbayItem($ebay_item_id);
+			}
 
-				if(is_numeric($ebay_item_quantity) && $new_ebay_item_quantity > 1) {
-					$ebay_response = 'REVISED EBAY ITEM QUANTITY: ' . $ebay_item_id . ' ';
-					$ebay_response .= $this->reviseEbayItemQuantity($ebay_item_id, $new_ebay_item_quantity);
-				}
+			if(is_numeric($ebay_item_quantity) && $new_ebay_item_quantity > 1) {
+				$ebay_response = 'REVISED EBAY ITEM QUANTITY - ItemID: ' . $ebay_item_id . ' - Response: ';
+				$ebay_response .= $this->reviseEbayItemQuantity($ebay_item_id, $new_ebay_item_quantity);
+			}
 
 				// add eBay response to db
 				$this->db->query("UPDATE " . DB_PREFIX . "order_product SET ebay_response = '" . $this->db->escape($ebay_response) . "' WHERE order_id = '" . (int)$order_id . "' AND product_id = '" . (int)$order_product['product_id'] . "'");

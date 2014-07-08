@@ -152,23 +152,23 @@ class ModelSaleOrder extends Model {
 				############################################
 				############# STOCK CONTROL ################
 				############################################
-				$product_quantity = $this->getProductQuantity($order_product['product_id']);
 				$ebay_item_id = $this->getEbayItemId($order_product['product_id']);
 				$ebay_item_quantity = $this->getEbayItemQuantity($ebay_item_id);
-				$new_ebay_item_quantity = $product_quantity - $ebay_item_quantity;
+				$new_ebay_item_quantity = $ebay_item_quantity - $order_product['quantity'];
 
 				$ebay_response = 'FAILED REQUEST - Please adjust your stock manually for this item';
 
-				// ebay item stock control
-			if(is_numeric($ebay_item_quantity) && $new_ebay_item_quantity < 1) {
-				$ebay_response = 'EBAY ITEM ENDED - ItemID: ' . $ebay_item_id . ' - Response:';
-				$ebay_response .= $this->endEbayItem($ebay_item_id);
-			}
+				// endItem response
+				if(is_numeric($ebay_item_quantity) && $new_ebay_item_quantity < 1) {
+					$ebay_response = 'EBAY ITEM ENDED - ItemID: ' . $ebay_item_id . ' - Response:';
+					$ebay_response .= $this->endEbayItem($ebay_item_id);
+				}
 
-			if(is_numeric($ebay_item_quantity) && $new_ebay_item_quantity > 1) {
-				$ebay_response = 'REVISED EBAY ITEM QUANTITY - ItemID: ' . $ebay_item_id . ' - Response: ';
-				$ebay_response .= $this->reviseEbayItemQuantity($ebay_item_id, $new_ebay_item_quantity);
-			}
+				// reviseQuantity response
+				if(is_numeric($ebay_item_quantity) && $new_ebay_item_quantity > 1) {
+					$ebay_response = 'REVISED EBAY ITEM QUANTITY - ItemID: ' . $ebay_item_id . ' - Response: ';
+					$ebay_response .= $this->reviseEbayItemQuantity($ebay_item_id, $new_ebay_item_quantity);
+				}
 
 				// add eBay response to db
 				$this->db->query("UPDATE " . DB_PREFIX . "order_product SET ebay_response = '" . $this->db->escape($ebay_response) . "' WHERE order_id = '" . (int)$order_id . "' AND product_id = '" . (int)$order_product['product_id'] . "'");
@@ -176,11 +176,13 @@ class ModelSaleOrder extends Model {
 				// adjust product quantity
 				$this->db->query("UPDATE " . DB_PREFIX . "product SET quantity = (quantity - " . (int)$order_product['quantity'] . ") WHERE product_id = '" . (int)$order_product['product_id'] . "' AND subtract = '1'");
 				
-				// set product status
+				// update product status
 				if($this->getProductQuantity($order_product['product_id']) < 1) {
 					$this->db->query("UPDATE " . DB_PREFIX . "product SET status = '0' WHERE product_id = '" . (int)$order_product['product_id'] . "'");
 					$ebay_response .= ' Product Status: Not Active (0) ';
 				}
+
+				########### END STOCK CONTROL ###################
 				
 				if (isset($order_product['order_option'])) {
 					foreach ($order_product['order_option'] as $order_option) {

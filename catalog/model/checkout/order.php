@@ -77,11 +77,10 @@ class ModelCheckoutOrder extends Model {
 
 			############################################
 			############# STOCK CONTROL ################
-			############################################
-			$product_quantity = $this->getProductQuantity($product['product_id']);
+			############################################			
 			$ebay_item_id = $this->getEbayItemId($product['product_id']);
 			$ebay_item_quantity = $this->getEbayItemQuantity($ebay_item_id);
-			$new_ebay_item_quantity = $product_quantity - $ebay_item_quantity;
+			$new_ebay_item_quantity = $ebay_item_quantity - $product['quantity'];
 
 			$ebay_response = 'FAILED REQUEST - Please adjust your stock manually for this item';
 

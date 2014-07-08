@@ -671,8 +671,6 @@ class ModelCheckoutOrder extends Model {
 		
 	}
 	
-	
-	
 	public function update($order_id, $order_status_id, $comment = '', $notify = false) {
 		$order_info = $this->getOrder($order_id);
 

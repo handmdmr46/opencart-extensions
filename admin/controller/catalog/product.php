@@ -599,7 +599,6 @@ class ControllerCatalogProduct extends Controller {
     	$this->getList();
   	}
 
-
   	protected function getForm() {
 		// language
     	$this->data['heading_title'] = $this->language->get('heading_title');

@@ -2,7 +2,7 @@
 class ModelSaleOrder extends Model {
 	/**
 	*  -- Update for master orders --
-	* affiliate_order = 0
+	* master_order = 0
 	* affiliate_id = 0
 	*
 	*/
@@ -123,14 +123,13 @@ class ModelSaleOrder extends Model {
 								comment = '" . $this->db->escape($data['comment']) . "', 
 								order_status_id = '" . (int)$data['order_status_id'] . "', 
 								affiliate_id  = '0', 
-								affiliate_order = '0',
+								master_order = '0',
 								language_id = '" . (int)$this->config->get('config_language_id') . "', 
 								currency_id = '" . (int)$currency_id . "', 
 								currency_code = '" . $this->db->escape($currency_code) . "', 
 								currency_value = '" . (float)$currency_value . "', 
 								date_added = NOW(), 
-								date_modified = NOW()");
-      							// , ebay_response = 
+								date_modified = NOW()");      							
 
       	$order_id = $this->db->getLastId();
 		
@@ -148,41 +147,6 @@ class ModelSaleOrder extends Model {
 										reward = '" . (int)$order_product['reward'] . "'");
 			
 				$order_product_id = $this->db->getLastId();
-
-				############################################
-				############# STOCK CONTROL ################
-				############################################
-				$ebay_item_id = $this->getEbayItemId($order_product['product_id']);
-				$ebay_item_quantity = $this->getEbayItemQuantity($ebay_item_id);
-				$new_ebay_item_quantity = $ebay_item_quantity - $order_product['quantity'];
-
-				$ebay_response = 'FAILED REQUEST - Please adjust your stock manually for this item';
-
-				// endItem response
-				if(is_numeric($ebay_item_quantity) && $new_ebay_item_quantity < 1) {
-					$ebay_response = 'EBAY ITEM ENDED - ItemID: ' . $ebay_item_id . ' - Response:';
-					$ebay_response .= $this->endEbayItem($ebay_item_id);
-				}
-
-				// reviseQuantity response
-				if(is_numeric($ebay_item_quantity) && $new_ebay_item_quantity > 1) {
-					$ebay_response = 'REVISED EBAY ITEM QUANTITY - ItemID: ' . $ebay_item_id . ' - Response: ';
-					$ebay_response .= $this->reviseEbayItemQuantity($ebay_item_id, $new_ebay_item_quantity);
-				}
-
-				// add eBay response to db
-				$this->db->query("UPDATE " . DB_PREFIX . "order_product SET ebay_response = '" . $this->db->escape($ebay_response) . "' WHERE order_id = '" . (int)$order_id . "' AND product_id = '" . (int)$order_product['product_id'] . "'");
-				
-				// adjust product quantity
-				$this->db->query("UPDATE " . DB_PREFIX . "product SET quantity = (quantity - " . (int)$order_product['quantity'] . ") WHERE product_id = '" . (int)$order_product['product_id'] . "' AND subtract = '1'");
-				
-				// update product status
-				if($this->getProductQuantity($order_product['product_id']) < 1) {
-					$this->db->query("UPDATE " . DB_PREFIX . "product SET status = '0' WHERE product_id = '" . (int)$order_product['product_id'] . "'");
-					$ebay_response .= ' Product Status: Not Active (0) ';
-				}
-
-				########### END STOCK CONTROL ###################
 				
 				if (isset($order_product['order_option'])) {
 					foreach ($order_product['order_option'] as $order_option) {
@@ -277,8 +241,12 @@ class ModelSaleOrder extends Model {
 							WHERE order_id = '" . (int)$order_id . "'"); 	
 	}
 
+	/** api tester method
+	*
+	*
+	*/
 	public function reviseEbayItemQuantity($ebay_item_id, $new_quantity) {
-		$call_name = 'reviseInventoryStatus';
+		$call_name = 'ReviseInventoryStatus';
 		$this->load->model('affiliate/stock_control');
 		$profile = $this->model_affiliate_stock_control->getEbayProfile();
 		$ebay_call = new Ebaycall($profile['developer_id'], $profile['application_id'], $profile['certification_id'], $profile['compat'], $profile['site_id'], $call_name);
@@ -325,8 +293,12 @@ class ModelSaleOrder extends Model {
         return $ebay_call_response;
 	}
 
+	/** api tester method
+	*
+	*
+	*/
 	public function endEbayItem($ebay_item_id) {
-		$call_name = 'endFixedPriceItem';
+		$call_name = 'EndFixedPriceItem';
 		$this->load->model('affiliate/stock_control');
 		$profile = $this->model_affiliate_stock_control->getEbayProfile();
 		$ebay_call = new Ebaycall($profile['developer_id'], $profile['application_id'], $profile['certification_id'], $profile['compat'], $profile['site_id'], $call_name);
@@ -370,8 +342,12 @@ class ModelSaleOrder extends Model {
         return $ebay_call_response;
 	}
 
+	/** api tester method
+	*
+	*
+	*/
 	public function getEbayItemQuantity($ebay_item_id) {
-		$call_name = 'getItem';
+		$call_name = 'GetItem';
 		$this->load->model('affiliate/stock_control');
 		$profile = $this->model_affiliate_stock_control->getEbayProfile();
 		$ebay_call = new Ebaycall($profile['developer_id'], $profile['application_id'], $profile['certification_id'], $profile['compat'], $profile['site_id'], $call_name);
@@ -413,11 +389,19 @@ class ModelSaleOrder extends Model {
         return $quantity;
 	}
 
+	/** tester method
+	*
+	*
+	*/
 	public function getProductQuantity($product_id) {
 		$product_quantity = $this->db->query("SELECT quantity FROM " . DB_PREFIX . "product WHERE product_id = '" . (int)$product_id . "'");
 		return $product_quantity->row['quantity'];
 	}
 
+	/** api tester method
+	*
+	*
+	*/
 	public function getEbayItemId($product_id) {
 		$ebay_item_id = $this->db->query("SELECT ebay_item_id FROM " . DB_PREFIX . "ebay_listing WHERE product_id = '" . (int)$product_id . "'");
 		return $ebay_item_id->row['ebay_item_id'];
@@ -520,7 +504,7 @@ class ModelSaleOrder extends Model {
 								comment = '" . $this->db->escape($data['comment']) . "', 
 								order_status_id = '" . (int)$data['order_status_id'] . "', 
 								affiliate_id  = '0', 
-								affiliate_order = '0',
+								master_order = '0',
 								date_modified = NOW() 
 							WHERE order_id = '" . (int)$order_id . "'");
 				
@@ -680,7 +664,7 @@ class ModelSaleOrder extends Model {
 											AS customer 
 											FROM `" . DB_PREFIX . "order` o 
 											WHERE o.order_id = '" . (int)$order_id . "' 
-											AND affiliate_order = '0'
+											AND master_order = '0'
 											AND affiliate_id = '0'");
 		if ($order_query->num_rows) {
 			$reward = 0;
@@ -701,16 +685,16 @@ class ModelSaleOrder extends Model {
 				$payment_iso_code_3 = '';
 			}
 
+			// Zone
 			$zone_query = $this->db->query("SELECT * FROM `" . DB_PREFIX . "zone` WHERE zone_id = '" . (int)$order_query->row['payment_zone_id'] . "'");
-
 			if ($zone_query->num_rows) {
 				$payment_zone_code = $zone_query->row['code'];
 			} else {
 				$payment_zone_code = '';
 			}
 			
+			// Country
 			$country_query = $this->db->query("SELECT * FROM `" . DB_PREFIX . "country` WHERE country_id = '" . (int)$order_query->row['shipping_country_id'] . "'");
-
 			if ($country_query->num_rows) {
 				$shipping_iso_code_2 = $country_query->row['iso_code_2'];
 				$shipping_iso_code_3 = $country_query->row['iso_code_3'];
@@ -719,22 +703,26 @@ class ModelSaleOrder extends Model {
 				$shipping_iso_code_3 = '';
 			}
 
+			// Zone shipping
 			$zone_query = $this->db->query("SELECT * FROM `" . DB_PREFIX . "zone` WHERE zone_id = '" . (int)$order_query->row['shipping_zone_id'] . "'");
-
 			if ($zone_query->num_rows) {
 				$shipping_zone_code = $zone_query->row['code'];
 			} else {
 				$shipping_zone_code = '';
 			}
-		
-			if ($order_query->row['affiliate_id']) {
+			
+
+			// Affiliate
+			foreach ($order_product_query->rows as $product) {
+
+			}
+			/*if ($order_query->row['affiliate_id']) {
 				$affiliate_id = $order_query->row['affiliate_id'];
 			} else {
 				$affiliate_id = 0;
 			}				
 				
 			$this->load->model('sale/affiliate');
-				
 			$affiliate_info = $this->model_sale_affiliate->getAffiliate($affiliate_id);
 				
 			if ($affiliate_info) {
@@ -743,12 +731,15 @@ class ModelSaleOrder extends Model {
 			} else {
 				$affiliate_firstname = '';
 				$affiliate_lastname = '';				
-			}
+			}*/
+			$affiliate_firstname = '';
+			$affiliate_lastname = '';
 
+
+
+			// Localisation language
 			$this->load->model('localisation/language');
-			
 			$language_info = $this->model_localisation_language->getLanguage($order_query->row['language_id']);
-			
 			if ($language_info) {
 				$language_code = $language_info['code'];
 				$language_filename = $language_info['filename'];
@@ -847,13 +838,89 @@ class ModelSaleOrder extends Model {
 						o.date_added, 
 						o.date_modified 
 				FROM   `" . DB_PREFIX . "order` o 
-				WHERE  o.affiliate_order = '0'
+				WHERE  o.master_order = '0'
 				AND    o.affiliate_id = '0'";
 
 		if (isset($data['filter_order_status_id']) && !is_null($data['filter_order_status_id'])) {
 			$sql .= " AND o.order_status_id = '" . (int)$data['filter_order_status_id'] . "'";
 		} else {
-			$sql .= " AND o.order_status_id > '0'";
+			$sql .= " AND o.order_status_id > '0'"; // only collect orders where order_status_id is not 0
+		}
+
+		if (!empty($data['filter_order_id'])) {
+			$sql .= " AND o.order_id = '" . (int)$data['filter_order_id'] . "'";
+		}
+
+		if (!empty($data['filter_customer'])) {
+			$sql .= " AND CONCAT(o.firstname, ' ', o.lastname) LIKE '%" . $this->db->escape($data['filter_customer']) . "%'";
+		}
+
+		if (!empty($data['filter_date_added'])) {
+			$sql .= " AND DATE(o.date_added) = DATE('" . $this->db->escape($data['filter_date_added']) . "')";
+		}
+		
+		if (!empty($data['filter_date_modified'])) {
+			$sql .= " AND DATE(o.date_modified) = DATE('" . $this->db->escape($data['filter_date_modified']) . "')";
+		}
+		
+		if (!empty($data['filter_total'])) {
+			$sql .= " AND o.total = '" . (float)$data['filter_total'] . "'";
+		}
+
+		$sort_data = array(
+			'o.order_id',
+			'customer',
+			'status',
+			'o.date_added',
+			'o.date_modified',
+			'o.total'
+		);
+
+		if (isset($data['sort']) && in_array($data['sort'], $sort_data)) {
+			$sql .= " ORDER BY " . $data['sort'];
+		} else {
+			$sql .= " ORDER BY o.order_id";
+		}
+
+		if (isset($data['order']) && ($data['order'] == 'DESC')) {
+			$sql .= " DESC";
+		} else {
+			$sql .= " ASC";
+		}
+
+		if (isset($data['start']) || isset($data['limit'])) {
+			if ($data['start'] < 0) {
+				$data['start'] = 0;
+			}
+
+			if ($data['limit'] < 1) {
+				$data['limit'] = 20;
+			}
+
+			$sql .= " LIMIT " . (int)$data['start'] . "," . (int)$data['limit'];
+		}
+
+		$query = $this->db->query($sql);
+
+		return $query->rows;
+	}
+
+	public function getMasterOrders($data = array()) {
+		$sql = "SELECT o.order_id, 
+				       CONCAT(o.firstname, ' ', o.lastname) AS customer, 
+				       (SELECT os.name FROM " . DB_PREFIX . "order_status os WHERE os.order_status_id = o.order_status_id AND os.language_id = '" . (int)$this->config->get('config_language_id') . "') AS status,
+						o.total, 
+						o.currency_code, 
+						o.currency_value, 
+						o.date_added, 
+						o.date_modified 
+				FROM   `" . DB_PREFIX . "order` o 
+				WHERE  o.master_order = '1'";
+
+		if (isset($data['filter_order_status_id']) && !is_null($data['filter_order_status_id'])) {
+			$sql .= " AND o.order_status_id = '" . (int)$data['filter_order_status_id'] . "'";
+		} else {
+			$sql .= " AND o.order_status_id > '0'"; // only collect orders where order_status_id is not 0
 		}
 
 		if (!empty($data['filter_order_id'])) {
@@ -919,6 +986,12 @@ class ModelSaleOrder extends Model {
 		
 		return $query->rows;
 	}
+
+	public function getAffiliateInfo($affiliate_id) {
+		$query = $this->db->query("SELECT * FROM " . DB_PREFIX . "affiliate WHERE affiliate_id = '" . (int)$affiliate_id . "'");
+
+		return $query->rows;
+	}
 	
 	public function getOrderOption($order_id, $order_option_id) {
 		$query = $this->db->query("SELECT * FROM " . DB_PREFIX . "order_option WHERE order_id = '" . (int)$order_id . "' AND order_option_id = '" . (int)$order_option_id . "'");
@@ -959,7 +1032,7 @@ class ModelSaleOrder extends Model {
 	public function getTotalOrders($data = array()) {
       	$sql = "SELECT COUNT(*) AS total 
 				FROM    `" . DB_PREFIX . "order`
-				WHERE   `affiliate_order` = '0'
+				WHERE   `master_order` = '0'
 				AND     `affiliate_id` = '0'";
 
 		if (isset($data['filter_order_status_id']) && !is_null($data['filter_order_status_id'])) {
@@ -1030,13 +1103,13 @@ class ModelSaleOrder extends Model {
 	}
 	
 	public function getAdminTotalSales() {
-      	$query = $this->db->query("SELECT SUM(total) AS total FROM `" . DB_PREFIX . "order` WHERE order_status_id > '0' AND affiliate_order = '0' AND affiliate_id = '0'");
+      	$query = $this->db->query("SELECT SUM(total) AS total FROM `" . DB_PREFIX . "order` WHERE order_status_id > '0' AND master_order = '0' AND affiliate_id = '0'");
 
 		return $query->row['total'];
 	}
 	
 	public function getAdminTotalSalesByYear($year) {
-      	$query = $this->db->query("SELECT SUM(total) AS total FROM `" . DB_PREFIX . "order` WHERE order_status_id > '0' AND YEAR(date_added) = '" . (int)$year . "' AND affiliate_order = '0' AND affiliate_id = '0'");
+      	$query = $this->db->query("SELECT SUM(total) AS total FROM `" . DB_PREFIX . "order` WHERE order_status_id > '0' AND YEAR(date_added) = '" . (int)$year . "' AND master_order = '0' AND affiliate_id = '0'");
 
 		return $query->row['total'];
 	}
@@ -1072,7 +1145,7 @@ class ModelSaleOrder extends Model {
 								comment = '" . $this->db->escape(strip_tags($data['comment'])) . "', 
 								date_added = NOW(),
 								affiliate_id = '0',
-								affiliate_order = '0'");
+								master_order = '0'");
 
 		$order_info = $this->getOrder($order_id);
 
@@ -1160,7 +1233,7 @@ class ModelSaleOrder extends Model {
 	  	$query = $this->db->query("SELECT COUNT(*) AS total FROM " . DB_PREFIX . "order_history 
 									 WHERE  order_id = '" . (int)$order_id . "'
 									 AND    affiliate_id = '0'
-									 AND    affiliate_order = '0'");
+									 AND    master_order = '0'");
 
 		return $query->row['total'];
 	}	
@@ -1169,7 +1242,7 @@ class ModelSaleOrder extends Model {
 	  	$query = $this->db->query("SELECT COUNT(*) AS total FROM " . DB_PREFIX . "order_history 
 									 WHERE  order_status_id = '" . (int)$order_status_id . "'
 									 AND    affiliate_id = '0'
-									 AND    affiliate_order = '0'");
+									 AND    master_order = '0'");
 
 		return $query->row['total'];
 	}	

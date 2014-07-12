@@ -34,7 +34,7 @@ class ModelAffiliateStockControl extends Model {
 	}
 
 	public function getEbayCallNames() {
-		$call_names = array('getOrders', 'getItem', 'endFixedPriceItem', 'reviseInventoryStatus');
+		$call_names = array('getOrders', 'getItemQuantity', 'endFixedPriceItem', 'reviseInventoryStatus');
 		return $call_names;
 	}
 
@@ -143,7 +143,7 @@ class ModelAffiliateStockControl extends Model {
 	}
 
 	public function getOrders() {
-		$call_name = 'getOrders';
+		$call_name = 'GetOrders';
 		$profile = $this->getEbayProfile();
 		$ebay_call = new Ebaycall($profile['developer_id'], $profile['application_id'], $profile['certification_id'], $profile['compat'], $profile['site_id'], $call_name);
 		
@@ -274,7 +274,7 @@ class ModelAffiliateStockControl extends Model {
 	}
 
 	public function getEbayItemQuantity($ebay_item_id) {
-		$call_name = 'getItem';
+		$call_name = 'GetItem';
 		$profile = $this->getEbayProfile();
 		$ebay_call = new Ebaycall($profile['developer_id'], $profile['application_id'], $profile['certification_id'], $profile['compat'], $profile['site_id'], $call_name);
 		
@@ -326,7 +326,7 @@ class ModelAffiliateStockControl extends Model {
 	}
 
 	public function reviseEbayItemQuantity($ebay_item_id, $new_quantity) {
-		$call_name = 'reviseInventoryStatus';
+		$call_name = 'ReviseInventoryStatus';
 		$profile = $this->getEbayProfile();
 		$ebay_call = new Ebaycall($profile['developer_id'], $profile['application_id'], $profile['certification_id'], $profile['compatability_level'], $profile['site_id'], $call_name);
 
@@ -371,7 +371,7 @@ class ModelAffiliateStockControl extends Model {
 	}
 
 	public function endEbayItem($ebay_item_id) {
-		$call_name = 'endFixedPriceItem';
+		$call_name = 'EndFixedPriceItem';
 		$profile = $this->getEbayProfile();
 		$ebay_call = new Ebaycall($profile['developer_id'], $profile['application_id'], $profile['certification_id'], $profile['compatability_level'], $profile['site_id'], $call_name);
 

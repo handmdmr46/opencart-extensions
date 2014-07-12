@@ -158,7 +158,7 @@ ADD COLUMN  `csv_import` int(11) NOT NULL DEFAULT'0';
 ADD COLUMN  `linked` int(11) NOT NULL DEFAULT '0';
 
 ALTER TABLE `db_order`
-ADD COLUMN  `affiliate_order` int(11) NOT NULL DEFAULT'0'
+ADD COLUMN  `master_order` int(11) NOT NULL DEFAULT'0'
 AFTER       `affiliate_id`;
 
 ALTER TABLE `db_order_product`

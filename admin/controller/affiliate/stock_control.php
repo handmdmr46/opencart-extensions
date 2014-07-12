@@ -244,10 +244,10 @@ class ControllerAffiliateStockControl extends Controller {
     		$this->redirect($this->url->link('affiliate/stock_control', 'token=' . $this->session->data['token'], 'SSL'));
 		}
 
-		if($this->request->post['ebay_call_name'] == 'getItem' && $this->request->server['REQUEST_METHOD'] == 'POST' && $this->validateEbayProfile() == 1) {
+		if($this->request->post['ebay_call_name'] == 'getItemQuantity' && $this->request->server['REQUEST_METHOD'] == 'POST' && $this->validateEbayProfile() == 1) {
 			// $this->session->data['getItemQuantity'] = $this->model_affiliate_stock_control->getItem($this->request->post['item_id']);	
 			// $this->session->data['getItemQuantity'] = $this->model_affiliate_stock_control->getProductQuantity($this->request->post['item_id']);
-			$this->session->data['getItemQuantity'] = $this->model_affiliate_stock_control->getEbayItemId($this->request->post['item_id']);
+			$this->session->data['getItemQuantity'] = $this->model_affiliate_stock_control->getEbayItemQuantity($this->request->post['item_id']);
 			$this->session->data['success'] = $this->language->get('success_get_item');		
     		$this->redirect($this->url->link('affiliate/stock_control', 'token=' . $this->session->data['token'], 'SSL'));
 

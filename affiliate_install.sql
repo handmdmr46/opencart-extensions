@@ -30,7 +30,7 @@ CREATE TABLE `db_affiliate_to_email` (
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;
 
-
+/*
 DROP TABLE IF EXISTS `db_affiliate_product_link`;
 CREATE TABLE `db_affiliate_product_link` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -41,7 +41,7 @@ CREATE TABLE `db_affiliate_product_link` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `product_id` (`product_id`,`ebay_item_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;
-
+*/
 
 DROP TABLE IF EXISTS `db_ebay_import_startdates`;
 CREATE TABLE `db_ebay_import_startdates` (
@@ -153,44 +153,35 @@ AFTER       `store_id`;
 
 ALTER TABLE `db_product`
 ADD COLUMN  `affiliate_id` int(11) NOT NULL DEFAULT'0',
-ADD COLUMN  `affiliate_order` int(11) NOT NULL DEFAULT'0',
-ADD COLUMN  `csv_import` int(11) NOT NULL DEFAULT'0';
+ADD COLUMN  `csv_import` int(11) NOT NULL DEFAULT'0',
 ADD COLUMN  `linked` int(11) NOT NULL DEFAULT '0';
 
-ALTER TABLE `db_order`
-ADD COLUMN  `master_order` int(11) NOT NULL DEFAULT'0'
+ALTER TABLE `db_order_product`
+ADD COLUMN  `affiliate_id` int(11) NOT NULL DEFAULT'0',
+ADD COLUMN  `ebay_response` varchar(500) NOT NULL DEFAULT'no response'
 AFTER       `affiliate_id`;
 
-ALTER TABLE `db_order_product`
-ADD COLUMN  `affiliate_id` int(11) NOT NULL DEFAULT'0';
-
 ALTER TABLE `db_order_total`
-ADD COLUMN  `affiliate_id` int(11) NOT NULL DEFAULT'0',
-ADD COLUMN  `affiliate_order` int(11) NOT NULL DEFAULT'0';
+ADD COLUMN  `affiliate_id` int(11) NOT NULL DEFAULT'0'
+AFTER       `sort_order`;
 
 ALTER TABLE `db_order_voucher`
-ADD COLUMN  `affiliate_id` int(11) NOT NULL DEFAULT'0',
-ADD COLUMN  `affiliate_order` int(11) NOT NULL DEFAULT'0';
+ADD COLUMN  `affiliate_id` int(11) NOT NULL DEFAULT'0';
 
 ALTER TABLE `db_order_option`
 ADD COLUMN  `affiliate_id` int(11) NOT NULL DEFAULT'0',
-ADD COLUMN  `affiliate_order` int(11) NOT NULL DEFAULT'0';
 
 ALTER TABLE `db_order_history`
-ADD COLUMN  `affiliate_id` int(11) NOT NULL DEFAULT'0',
-ADD COLUMN  `master_order` int(11) NOT NULL DEFAULT'0';
+ADD COLUMN  `affiliate_id` int(11) NOT NULL DEFAULT'0';
 
 ALTER TABLE `db_order_fraud`
-ADD COLUMN  `affiliate_id` int(11) NOT NULL DEFAULT'0',
-ADD COLUMN  `affiliate_order` int(11) NOT NULL DEFAULT'0';
+ADD COLUMN  `affiliate_id` int(11) NOT NULL DEFAULT'0';
 
 ALTER TABLE `db_order_field`
-ADD COLUMN  `affiliate_id` int(11) NOT NULL DEFAULT'0',
-ADD COLUMN  `affiliate_order` int(11) NOT NULL DEFAULT'0';
+ADD COLUMN  `affiliate_id` int(11) NOT NULL DEFAULT'0';
 
 ALTER TABLE `db_order_download`
-ADD COLUMN  `affiliate_id` int(11) NOT NULL DEFAULT'0',
-ADD COLUMN  `affiliate_order` int(11) NOT NULL DEFAULT'0';
+ADD COLUMN  `affiliate_id` int(11) NOT NULL DEFAULT'0';
 
 ALTER TABLE `db_category`
 ADD COLUMN  `manufacturer_id` int(11) NOT NULL DEFAULT'0'
@@ -200,6 +191,4 @@ ALTER TABLE `db_ebay_listing`
 ADD COLUMN  `affiliate_id` int(11) NOT NULL DEFAULT'0'
 AFTER       `status`;
 
-ALTER TABLE `db_order_product`
-ADD COLUMN  `ebay_response` varchar(500) NOT NULL DEFAULT'no response'
-AFTER       `affiliate_order`;
+

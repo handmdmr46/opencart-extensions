@@ -178,7 +178,7 @@ ADD COLUMN  `affiliate_order` int(11) NOT NULL DEFAULT'0';
 
 ALTER TABLE `db_order_history`
 ADD COLUMN  `affiliate_id` int(11) NOT NULL DEFAULT'0',
-ADD COLUMN  `affiliate_order` int(11) NOT NULL DEFAULT'0';
+ADD COLUMN  `master_order` int(11) NOT NULL DEFAULT'0';
 
 ALTER TABLE `db_order_fraud`
 ADD COLUMN  `affiliate_id` int(11) NOT NULL DEFAULT'0',

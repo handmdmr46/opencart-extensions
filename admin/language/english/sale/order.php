@@ -133,6 +133,7 @@ $_['column_comment']                          = 'Comment';
 $_['column_notify']                           = 'Customer Notified';
 $_['column_action']                           = 'Action';
 $_['column_ebay_response'] = 'eBay Response';
+$_['column_seller'] = 'Seller';
 
 // Entry
 $_['entry_store']                             = 'Store:';
@@ -200,4 +201,5 @@ $_['error_filetype']                          = 'Invalid file type!';
 $_['error_action']                            = 'Warning: Could not complete this action!';
 
 $_['tab_stock_control'] = 'Stock Control';
+$_['heading_title_master'] = 'Master Orders';
 ?>

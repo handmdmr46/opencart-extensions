@@ -293,6 +293,7 @@
           <thead>
             <tr>
               <td class="left"><?php echo $column_product; ?></td>
+              <td class="left"><?php echo $column_seller; ?></td>
               <td class="left"><?php echo $column_model; ?></td>
               <td class="right"><?php echo $column_quantity; ?></td>
               <td class="right"><?php echo $column_price; ?></td>
@@ -311,7 +312,8 @@
                 &nbsp;<small> - <?php echo $option['name']; ?>: <a href="<?php echo $option['href']; ?>"><?php echo $option['value']; ?></a></small>
                 <?php } ?>
                 <?php } ?></td>
-              <td class="left"><?php echo $product['model']; ?></td>
+              <td class="left"><?php echo $product['affiliate_firstname'] . ' ' . $product['affiliate_lastname']; ?></td>  
+              <td class="left"><?php echo $product['model']; ?></td>              
               <td class="right"><?php echo $product['quantity']; ?></td>
               <td class="right"><?php echo $product['price']; ?></td>
               <td class="right"><?php echo $product['total']; ?></td>
@@ -330,7 +332,7 @@
           <?php foreach ($totals as $totals) { ?>
           <tbody id="totals">
             <tr>
-              <td colspan="4" class="right"><?php echo $totals['title']; ?>:</td>
+              <td colspan="5" class="right"><?php echo $totals['title']; ?>:</td>
               <td class="right"><?php echo $totals['text']; ?></td>
             </tr>
           </tbody>

@@ -60,6 +60,7 @@ class ControllerCommonHeader extends Controller {
 			$this->data['text_module']                      = $this->language->get('text_module');
 			$this->data['text_option']                      = $this->language->get('text_option');
 			$this->data['text_order']                       = $this->language->get('text_order');
+			$this->data['text_order_master']                = $this->language->get('text_order_master');
 			$this->data['text_order_status']                = $this->language->get('text_order_status');
 			$this->data['text_opencart']                    = $this->language->get('text_opencart');
 			$this->data['text_payment']                     = $this->language->get('text_payment');
@@ -160,6 +161,7 @@ class ControllerCommonHeader extends Controller {
 			$this->data['module']                      = $this->url->link('extension/module', 'token=' . $this->session->data['token'], 'SSL');
 			$this->data['option']                      = $this->url->link('catalog/option', 'token=' . $this->session->data['token'], 'SSL');
 			$this->data['order']                       = $this->url->link('sale/order', 'token=' . $this->session->data['token'], 'SSL');
+			$this->data['order_master']                = $this->url->link('sale/order_master', 'token=' . $this->session->data['token'], 'SSL');
 			$this->data['order_status']                = $this->url->link('localisation/order_status', 'token=' . $this->session->data['token'], 'SSL');
 			$this->data['payment']                     = $this->url->link('extension/payment', 'token=' . $this->session->data['token'], 'SSL');
 			$this->data['product']                     = $this->url->link('catalog/product', 'token=' . $this->session->data['token'], 'SSL');

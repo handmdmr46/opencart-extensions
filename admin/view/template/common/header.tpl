@@ -94,6 +94,7 @@ $(document).ready(function(){
       <li id="sale"><a class="top"><?php echo $text_sale; ?></a>
         <ul>
           <li><a href="<?php echo $order; ?>"><?php echo $text_order; ?></a></li>
+          <li><a href="<?php echo $order_master; ?>"><?php echo $text_order_master; ?></a></li>
           <li><a href="<?php echo $return; ?>"><?php echo $text_return; ?></a></li>
           <li><a class="parent"><?php echo $text_customer; ?></a>
             <ul>

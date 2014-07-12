@@ -39,6 +39,7 @@ $_['text_manufacturer']                = 'Manufacturers';
 $_['text_module']                      = 'Modules';
 $_['text_option']                      = 'Options';
 $_['text_order']                       = 'Orders';
+$_['text_order_master']                = 'Master Orders';
 $_['text_order_status']                = 'Order Statuses';
 $_['text_opencart']                    = 'Homepage';
 $_['text_payment']                     = 'Payments';

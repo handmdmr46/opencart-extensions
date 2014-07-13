@@ -55,8 +55,7 @@ class ModelCheckoutOrder extends Model {
 								user_agent = '" . $this->db->escape($data['user_agent']) . "', 
 								accept_language = '" . $this->db->escape($data['accept_language']) . "', 
 								date_added = NOW(), 
-								date_modified = NOW(),
-								master_order = '1'");
+								date_modified = NOW()");
 								
 		$order_id = $this->db->getLastId();
 
@@ -131,11 +130,8 @@ class ModelCheckoutOrder extends Model {
 
 	public function getOrder($order_id) {
 		$order_query = $this->db->query("SELECT *, 
-											(SELECT os.name 
-											 FROM `" . DB_PREFIX . "order_status` os 
-											 WHERE os.order_status_id = o.order_status_id 
-											 AND os.language_id = o.language_id) AS order_status 
-										FROM `" . DB_PREFIX . "order` o 
+										(SELECT os.name FROM " . DB_PREFIX . "order_status os WHERE os.order_status_id = o.order_status_id AND os.language_id = o.language_id) AS order_status
+										FROM  " . DB_PREFIX . "order o 
 										WHERE o.order_id = '" . (int)$order_id . "'");
 			
 		if ($order_query->num_rows) {
@@ -308,14 +304,14 @@ class ModelCheckoutOrder extends Model {
 				############# STOCK CONTROL ################
 				############################################			
 				
-				$ebay_item_id = $this->getEbayItemId($order_product['product_id']);
+				/*$ebay_item_id = $this->getEbayItemId($order_product['product_id']);
 				$ebay_item_quantity = $this->getEbayItemQuantity($ebay_item_id);
-				$new_ebay_item_quantity = $ebay_item_quantity - $order_product['quantity'];
+				$new_ebay_item_quantity = $ebay_item_quantity - $order_product['quantity'];*/
 
 				$ebay_response = 'FAILED REQUEST - Please adjust your stock manually for this item';
 
 				// ebay item stock control
-				if(is_numeric($ebay_item_quantity) && $new_ebay_item_quantity < 1) {
+				/*if(is_numeric($ebay_item_quantity) && $new_ebay_item_quantity < 1) {
 					$ebay_response = 'EBAY ITEM ENDED - ItemID: ' . $ebay_item_id . ' - Response:';
 					$ebay_response .= $this->endEbayItem($ebay_item_id);
 				}
@@ -323,10 +319,11 @@ class ModelCheckoutOrder extends Model {
 				if(is_numeric($ebay_item_quantity) && $new_ebay_item_quantity > 1) {
 					$ebay_response = 'REVISED EBAY ITEM QUANTITY - ItemID: ' . $ebay_item_id . ' - Response: ';
 					$ebay_response .= $this->reviseEbayItemQuantity($ebay_item_id, $new_ebay_item_quantity);
-				}
+				}*/
 
 				// add eBay response to db
-				$this->db->query("UPDATE " . DB_PREFIX . "order_product SET ebay_response = '" . $this->db->escape($ebay_response) . "' WHERE order_id = '" . (int)$order_id . "' AND product_id = '" . (int)$order_product['product_id'] . "'");				
+				// $this->db->query("UPDATE " . DB_PREFIX . "order_product SET ebay_response = '" . $this->db->escape($ebay_response) . "' WHERE order_id = '" . (int)$order_id . "' AND product_id = '" . (int)$order_product['product_id'] . "'");				
+				
 
 				// adjust product quantity
 				$this->db->query("UPDATE " . DB_PREFIX . "product SET quantity = (quantity - " . (int)$order_product['quantity'] . ") WHERE product_id = '" . (int)$order_product['product_id'] . "' AND subtract = '1'");				
@@ -334,7 +331,7 @@ class ModelCheckoutOrder extends Model {
 				// set product status
 				if($this->getProductQuantity($order_product['product_id']) < 1) {
 					$this->db->query("UPDATE " . DB_PREFIX . "product SET status = '0' WHERE product_id = '" . (int)$order_product['product_id'] . "'");
-					$ebay_response .= ' Product Status: Not Active (0) ';
+					$ebay_response .= ' - Opencart Product Status: Not Active (0) ';
 				}
 
 				// order options
@@ -373,7 +370,7 @@ class ModelCheckoutOrder extends Model {
 				}
 			}
 			
-			// Send out order confirmation mail
+			// Send out order confirmation mail - to customer??
 			$language = new Language($order_info['language_directory']);
 			$language->load($order_info['language_filename']);
 			$language->load('mail/order');
@@ -558,7 +555,7 @@ class ModelCheckoutOrder extends Model {
 				$html = $template->fetch('default/template/mail/order.tpl');
 			}
 			
-			// Text Mail
+			// Text Email Header
 			$text  = sprintf($language->get('text_new_greeting'), html_entity_decode($order_info['store_name'], ENT_QUOTES, 'UTF-8')) . "\n\n";
 			$text .= $language->get('text_new_order_id') . ' ' . $order_id . "\n";
 			$text .= $language->get('text_new_date_added') . ' ' . date($language->get('date_format_short'), strtotime($order_info['date_added'])) . "\n";
@@ -569,49 +566,49 @@ class ModelCheckoutOrder extends Model {
 				$text .= $comment . "\n\n";
 			}
 			
-			// Products
+			//Text Email Products
 			$text .= $language->get('text_new_products') . "\n";
-			
 			foreach ($order_product_query->rows as $product) {
 				$text .= $product['quantity'] . 'x ' . $product['name'] . ' (' . $product['model'] . ') ' . html_entity_decode($this->currency->format($product['total'] + ($this->config->get('config_tax') ? ($product['tax'] * $product['quantity']) : 0), $order_info['currency_code'], $order_info['currency_value']), ENT_NOQUOTES, 'UTF-8') . "\n";
 				
 				$order_option_query = $this->db->query("SELECT * FROM " . DB_PREFIX . "order_option WHERE order_id = '" . (int)$order_id . "' AND order_product_id = '" . $product['order_product_id'] . "'");
-				
 				foreach ($order_option_query->rows as $option) {
 					$text .= chr(9) . '-' . $option['name'] . ' ' . (utf8_strlen($option['value']) > 20 ? utf8_substr($option['value'], 0, 20) . '..' : $option['value']) . "\n";
 				}
 			}
 			
+			// Text Email Vouchers
 			foreach ($order_voucher_query->rows as $voucher) {
 				$text .= '1x ' . $voucher['description'] . ' ' . $this->currency->format($voucher['amount'], $order_info['currency_code'], $order_info['currency_value']);
 			}
-						
+			
+			// Text Email Order Total			
 			$text .= "\n";
-			
 			$text .= $language->get('text_new_order_total') . "\n";
-			
 			foreach ($order_total_query->rows as $total) {
 				$text .= $total['title'] . ': ' . html_entity_decode($total['text'], ENT_NOQUOTES, 'UTF-8') . "\n";
 			}			
 			
+			// Text Email Link
 			$text .= "\n";
-			
 			if ($order_info['customer_id']) {
 				$text .= $language->get('text_new_link') . "\n";
 				$text .= $order_info['store_url'] . 'index.php?route=account/order/info&order_id=' . $order_id . "\n\n";
 			}
-		
+			
+			// Text Email Download Link
 			if ($order_download_query->num_rows) {
 				$text .= $language->get('text_new_download') . "\n";
 				$text .= $order_info['store_url'] . 'index.php?route=account/download' . "\n\n";
 			}
 			
-			// Comment
+			// Text Email Comment
 			if ($order_info['comment']) {
 				$text .= $language->get('text_new_comment') . "\n\n";
 				$text .= $order_info['comment'] . "\n\n";
 			}
 
+			// Text Email Footer
 			$text .= $language->get('text_new_footer') . "\n\n";
 		
 			$mail = new Mail(); 
@@ -630,7 +627,7 @@ class ModelCheckoutOrder extends Model {
 			$mail->setText(html_entity_decode($text, ENT_QUOTES, 'UTF-8'));
 			$mail->send();
 
-			// Admin Alert Mail
+			// Send Order Alert Email
 			if ($this->config->get('config_alert_mail')) {
 				$subject = sprintf($language->get('text_new_subject'), html_entity_decode($this->config->get('config_name'), ENT_QUOTES, 'UTF-8'), $order_id);
 				
@@ -700,7 +697,9 @@ class ModelCheckoutOrder extends Model {
 						$mail->send();
 					}
 				}				
-			}		
+			}	
+
+			// Send Affiliates Order Alert Email	
 		}
 		
 		$this->load->model('affiliate/dashboard_order_total');

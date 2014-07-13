@@ -348,43 +348,46 @@ class ControllerCatalogProduct extends Controller {
 		$results = $this->model_catalog_product->getProducts($data);
 
 		foreach ($results as $result) {
-			$action = array();
+			// if($result['affiliate_id'] == 0) {
 
-			$action[] = array(
-				'text' => $this->language->get('text_edit'),
-				'href' => $this->url->link('catalog/product/update', 'token=' . $this->session->data['token'] . '&product_id=' . $result['product_id'] . $url, 'SSL')
-			);
+				$action = array();
 
-			if ($result['image'] && file_exists(DIR_IMAGE . $result['image'])) {
-				$image = $this->model_tool_image->resize($result['image'], 40, 40);
-			} else {
-				$image = $this->model_tool_image->resize('no_image.jpg', 40, 40);
-			}
+				$action[] = array(
+					'text' => $this->language->get('text_edit'),
+					'href' => $this->url->link('catalog/product/update', 'token=' . $this->session->data['token'] . '&product_id=' . $result['product_id'] . $url, 'SSL')
+				);
 
-			$special = false;
-
-			$product_specials = $this->model_catalog_product->getProductSpecials($result['product_id']);
-
-			foreach ($product_specials  as $product_special) {
-				if (($product_special['date_start'] == '0000-00-00' || $product_special['date_start'] < date('Y-m-d')) && ($product_special['date_end'] == '0000-00-00' || $product_special['date_end'] > date('Y-m-d'))) {
-					$special = $product_special['price'];
-
-					break;
+				if ($result['image'] && file_exists(DIR_IMAGE . $result['image'])) {
+					$image = $this->model_tool_image->resize($result['image'], 40, 40);
+				} else {
+					$image = $this->model_tool_image->resize('no_image.jpg', 40, 40);
 				}
-			}
 
-      		$this->data['products'][] = array(
-				'product_id' => $result['product_id'],
-				'name'       => $result['name'],
-				'model'      => $result['model'],
-				'price'      => $result['price'],
-				'special'    => $special,
-				'image'      => $image,
-				'quantity'   => $result['quantity'],
-				'status'     => ($result['status'] ? $this->language->get('text_enabled') : $this->language->get('text_disabled')),
-				'selected'   => isset($this->request->post['selected']) && in_array($result['product_id'], $this->request->post['selected']),
-				'action'     => $action
-			);
+				$special = false;
+
+				$product_specials = $this->model_catalog_product->getProductSpecials($result['product_id']);
+
+				foreach ($product_specials  as $product_special) {
+					if (($product_special['date_start'] == '0000-00-00' || $product_special['date_start'] < date('Y-m-d')) && ($product_special['date_end'] == '0000-00-00' || $product_special['date_end'] > date('Y-m-d'))) {
+						$special = $product_special['price'];
+
+						break;
+					}
+				}
+
+	      		$this->data['products'][] = array(
+					'product_id' => $result['product_id'],
+					'name'       => $result['name'],
+					'model'      => $result['model'],
+					'price'      => $result['price'],
+					'special'    => $special,
+					'image'      => $image,
+					'quantity'   => $result['quantity'],
+					'status'     => ($result['status'] ? $this->language->get('text_enabled') : $this->language->get('text_disabled')),
+					'selected'   => isset($this->request->post['selected']) && in_array($result['product_id'], $this->request->post['selected']),
+					'action'     => $action
+				);
+      		// }
     	}
 
 		$this->data['heading_title'] = $this->language->get('heading_title');

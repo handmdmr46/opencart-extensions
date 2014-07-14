@@ -175,14 +175,14 @@ $(document).ready(function(){
                 <li><a href="<?php echo $csv_import; ?>"><?php echo $text_import_csv; ?></a></li>
                 <li><a href="<?php echo $ebayid_import; ?>"><?php echo $text_import_ebayid; ?></a></li>
               </ul>
-          </li>
-          
+          </li>          
           <li><a class="parent" href="<?php echo $stock_control; ?>"><?php echo $text_stock_control; ?></a>
               <ul>
                 <li><a href="<?php echo $linked_products; ?>"><?php echo $text_linked_products; ?></a></li>
                 <li><a href="<?php echo $unlinked_products; ?>"><?php echo $text_unlinked_products; ?></a></li>
               </ul>
           </li>
+          <li><a href="<?php echo $ebay_log; ?>"><?php echo $text_ebay_log; ?></a></li>
         </ul>
       </li>
       <li id="reports"><a class="top"><?php echo $text_reports; ?></a>

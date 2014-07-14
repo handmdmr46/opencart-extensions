@@ -98,7 +98,8 @@ $_['text_import_ebayid']               = 'Import eBayID - step 2';
 $_['text_stock_control']               = 'Stock Control';
 $_['text_linked_products']             = 'Linked Products';
 $_['text_unlinked_products']           = 'Unlinked Products';
-$_['text_import'] = 'Import';
+$_['text_import'] 					   = 'Import';
+$_['text_ebay_log'] 				   = 'eBay Log';
 
 //$_['']                               = '';
 

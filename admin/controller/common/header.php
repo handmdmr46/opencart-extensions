@@ -122,7 +122,8 @@ class ControllerCommonHeader extends Controller {
 			$this->data['text_stock_control']               = $this->language->get('text_stock_control');
 			$this->data['text_linked_products']             = $this->language->get('text_linked_products');
 			$this->data['text_unlinked_products']           = $this->language->get('text_unlinked_products');
-			
+			$this->data['text_ebay_log'] 					= $this->language->get('text_ebay_log');
+
 			// Logged || Logout user message above search field
 			if (!$this->user->isLogged() || !isset($this->request->get['token']) || !isset($this->session->data['token']) || ($this->request->get['token'] != $this->session->data['token'])) {
 			$this->data['logged'] = '';
@@ -210,6 +211,7 @@ class ControllerCommonHeader extends Controller {
 			$this->data['stock_control']               = $this->url->link('affiliate/stock_control', 'token=' . $this->session->data['token'], 'SSL');
 			$this->data['linked_products']             = $this->url->link('affiliate/linked_products', 'token=' . $this->session->data['token'], 'SSL');
 			$this->data['unlinked_products']           = $this->url->link('affiliate/unlinked_products', 'token=' . $this->session->data['token'], 'SSL');
+			$this->data['ebay_log']           		   = $this->url->link('affiliate/ebay_cron_log', 'token=' . $this->session->data['token'], 'SSL');
 
 			$this->data['stores'] = array();
 

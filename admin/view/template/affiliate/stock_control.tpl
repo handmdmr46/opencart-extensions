@@ -152,6 +152,13 @@
 		          </td>
 		          <td></td>
 		        </tr>
+		        <tr>
+		          <td><?php echo 'New Quantity' ?></td>
+		          <td>
+		            <input name="new_quantity" value="<?php echo $new_quantity; ?>" type="text" size="20" required>		           
+		          </td>
+		          <td></td>
+		        </tr>
 		        
 		        <?php if ($getOrders) { ?>
 		        	<tr><td style="width:500px;">
@@ -179,7 +186,7 @@
 		        		// echo $getItemTitle;
 		        		// echo $getItemId;
 		        		echo $getItemQuantity;
-
+		        		echo $reviseInventoryStatus;
 		        	?>
 		        	</td></tr>
 				<?php //} ?>		      

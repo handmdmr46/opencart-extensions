@@ -22,7 +22,7 @@ class ModelAffiliateStockControl extends Model {
 	}
 	
 	public function getEbayCompatibilityLevels() {
-		$sql = "SELECT * FROM " . DB_PREFIX . "ebay_compatibility";
+		$sql = "SELECT * FROM " . DB_PREFIX . "ebay_compatibility ORDER BY id DESC";
 		$query = $this->db->query($sql);
 		return $query->rows;
 	}
@@ -93,9 +93,8 @@ class ModelAffiliateStockControl extends Model {
 				WHERE    pd.product_id IN (
 										   SELECT product_id p
                    					   	   FROM   " . DB_PREFIX . "product p
-                   					   	   WHERE  p.status = '0'
-                   					   	   AND    p.affiliate_id = '0'
-                   					   	   AND 	  p.linked = '0'
+                   					   	   WHERE  p.affiliate_id = '0'
+                   					   	   AND 	  p.linked = '0'                   					   	   
                    					   	   )
 				ORDER BY pd.name DESC";
 
@@ -142,7 +141,7 @@ class ModelAffiliateStockControl extends Model {
 		$this->db->query("DELETE FROM " . DB_PREFIX . "ebay_listing WHERE product_id = '" . $this->db->escape($product_id) . "'");
 	}
 
-	public function getOrders() {
+	public function getOrdersRequest() {
 		$call_name = 'GetOrders';
 		$profile = $this->getEbayProfile();
 		$ebay_call = new Ebaycall($profile['developer_id'], $profile['application_id'], $profile['certification_id'], $profile['compat'], $profile['site_id'], $call_name);
@@ -324,11 +323,11 @@ class ModelAffiliateStockControl extends Model {
 		$ebay_item_id = $this->db->query("SELECT ebay_item_id FROM " . DB_PREFIX . "ebay_listing WHERE product_id = '" . (int)$product_id . "'");
 		return $ebay_item_id->row['ebay_item_id'];
 	}
-
+	// tested working
 	public function reviseEbayItemQuantity($ebay_item_id, $new_quantity) {
 		$call_name = 'ReviseInventoryStatus';
 		$profile = $this->getEbayProfile();
-		$ebay_call = new Ebaycall($profile['developer_id'], $profile['application_id'], $profile['certification_id'], $profile['compatability_level'], $profile['site_id'], $call_name);
+		$ebay_call = new Ebaycall($profile['developer_id'], $profile['application_id'], $profile['certification_id'], $profile['compat'], $profile['site_id'], $call_name);
 
 		$xml = '<?xml version="1.0" encoding="utf-8"?>';
 		$xml .= '<ReviseInventoryStatusRequest xmlns="urn:ebay:apis:eBLBaseComponents">';
@@ -365,6 +364,9 @@ class ModelAffiliateStockControl extends Model {
 
         if($message == 'Success') {
         	$ebay_call_response = $doc_response->getElementsByTagName('Timestamp')->item(0)->nodeValue;
+        	$ebay_call_response .= '<br>' . $doc_response->getElementsByTagName('ItemID')->item(0)->nodeValue;
+        	$ebay_call_response .= '<br>' .$doc_response->getElementsByTagName('StartPrice')->item(0)->nodeValue;
+        	$ebay_call_response .= '<br>' .$doc_response->getElementsByTagName('Quantity')->item(0)->nodeValue;
         }
 
         return $ebay_call_response;

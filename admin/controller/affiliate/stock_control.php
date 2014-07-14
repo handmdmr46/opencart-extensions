@@ -151,6 +151,13 @@ class ControllerAffiliateStockControl extends Controller {
 	      $this->data['getItemQuantity'] = '';
 	    }
 
+	    if (isset($this->session->data['reviseInventoryStatus'])) {
+	    	$this->data['reviseInventoryStatus'] = $this->session->data['reviseInventoryStatus'];
+	      	unset($this->session->data['reviseInventoryStatus']);
+	    } else {
+	      $this->data['reviseInventoryStatus'] = '';
+	    }
+
 	    // Page, Start & Limit -- pagination --
 	    if (isset($this->request->get['page'])) {
 	      $page = $this->request->get['page'];
@@ -218,6 +225,7 @@ class ControllerAffiliateStockControl extends Controller {
 	    }
 
 	    $this->data['item_id'] = '';
+	    $this->data['new_quantity'] = '';
 
 		// Load Template View
 		$this->template = 'affiliate/stock_control.tpl';
@@ -239,14 +247,12 @@ class ControllerAffiliateStockControl extends Controller {
 		}
 
 		if($this->request->post['ebay_call_name'] == 'getOrders' && $this->request->server['REQUEST_METHOD'] == 'POST' && $this->validateEbayProfile() == 1) {
-			$this->session->data['getOrders'] = $this->model_affiliate_stock_control->getOrders();
+			$this->session->data['getOrders'] = $this->model_affiliate_stock_control->getOrdersRequest();
 		    $this->session->data['success'] = $this->language->get('success_get_orders');			
     		$this->redirect($this->url->link('affiliate/stock_control', 'token=' . $this->session->data['token'], 'SSL'));
 		}
 
 		if($this->request->post['ebay_call_name'] == 'getItemQuantity' && $this->request->server['REQUEST_METHOD'] == 'POST' && $this->validateEbayProfile() == 1) {
-			// $this->session->data['getItemQuantity'] = $this->model_affiliate_stock_control->getItem($this->request->post['item_id']);	
-			// $this->session->data['getItemQuantity'] = $this->model_affiliate_stock_control->getProductQuantity($this->request->post['item_id']);
 			$this->session->data['getItemQuantity'] = $this->model_affiliate_stock_control->getEbayItemQuantity($this->request->post['item_id']);
 			$this->session->data['success'] = $this->language->get('success_get_item');		
     		$this->redirect($this->url->link('affiliate/stock_control', 'token=' . $this->session->data['token'], 'SSL'));
@@ -259,117 +265,13 @@ class ControllerAffiliateStockControl extends Controller {
 		}
 
 		if($this->request->post['ebay_call_name'] == 'reviseInventoryStatus' && $this->request->server['REQUEST_METHOD'] == 'POST' && $this->validateEbayProfile() == 1) {
+			$this->session->data['reviseInventoryStatus'] = $this->model_affiliate_stock_control->reviseEbayItemQuantity($this->request->post['item_id'], $this->request->post['new_quantity']);
 			$this->session->data['success'] = $this->language->get('success_revise_item');
     		$this->redirect($this->url->link('affiliate/stock_control', 'token=' . $this->session->data['token'], 'SSL'));
 		}
 
 		$this->session->data['error'] = $this->language->get('error');
     	$this->redirect($this->url->link('affiliate/stock_control', 'token=' . $this->session->data['token'], 'SSL'));
-	}
-
-	public function endItem($item_id) {
-		if ($this->request->server['REQUEST_METHOD'] == 'POST' && $this->validateEbayProfile() == 1) {
-
-			$call_name = 'endFixedPriceItem';
-			$ebay_call = new Ebaycall($this->request->post['developer_id'], $this->request->post['application_id'], $this->request->post['certification_id'], $this->request->post['compatability_level'], $this->request->post['site_id'], $call_name);
-
-			$xml = '<?xml version="1.0" encoding="utf-8"?>';			
-			$xml .= '<EndFixedPriceItemRequest xmlns="urn:ebay:apis:eBLBaseComponents">';
-  			$xml .= '<ItemID>' . $item_id . '</ItemID>';
-  			$xml .= '<EndingReason EnumType="EndReasonCodeType">NotAvailable</EndingReason>';
-  			$xml .= '<RequesterCredentials><eBayAuthToken>' . $this->request->post['user_token'] . '</eBayAuthToken></RequesterCredentials>';    		  			
-			$xml .= '</EndFixedPriceItemRequest>';
-
-			$xml_response = $ebay_call->sendHttpRequest($xml);
-
-	        if(stristr($xml_response, 'HTTP 404') || $xml_response == '') {
-		        $this->session->data['error'] = $this->language->get('error_ebay_api_call');
-		        $url = '';
-		        if (isset($this->request->get['page'])) {
-		          $url .= '&page=' . $this->request->get['page'];
-		        }
-		        $this->redirect($this->url->link('affiliate/stock_control', 'token=' . $this->session->data['token'] . $url, 'SSL'));
-	        }
-
-	        $doc_response = new DomDocument();
-	        $doc_response->loadXML($xml_response);
-	        $message = $doc_response->getElementsByTagName('Ack')->item(0)->nodeValue;
-	        
-	        if($message == 'Failure') {
-	        	$severity_code = $doc_response->getElementsByTagName('SeverityCode')->item(0)->nodeValue;
-	        	$error_code = $doc_response->getElementsByTagName('ErrorCode')->item(0)->nodeValue;
-	        	$short_message = $doc_response->getElementsByTagName('ShortMessage')->item(0)->nodeValue;
-	        	$long_message = $doc_response->getElementsByTagName('LongMessage')->item(0)->nodeValue;
-		        $this->session->data['error'] = strtoupper($severity_code) . ': ' . $long_message . ' Error Code: ' . $error_code;
-		        $url = '';
-		        if (isset($this->request->get['page'])) {
-		          $url .= '&page=' . $this->request->get['page'];
-		        }
-		        $this->redirect($this->url->link('affiliate/stock_control', 'token=' . $this->session->data['token'] . $url, 'SSL'));
-	        }
-
-	        if($message->item(0)->nodeValue == 'Success') {
-		        $this->session->data['success'] = $this->language->get('success_end_item');
-		        $url = '';
-		        if (isset($this->request->get['page'])) {
-		          $url .= '&page=' . $this->request->get['page'];
-		        }
-		        $this->redirect($this->url->link('affiliate/stock_control', 'token=' . $this->session->data['token'] . $url, 'SSL'));
-	        }
-
-		}
-	}
-
-	public function setItemQuantity($quantity, $item_id) {
-		if ($this->request->server['REQUEST_METHOD'] == 'POST' && $this->validateEbayProfile() == 1) {
-			$call_name = 'reviseInventoryStatus';
-			$ebay_call = new Ebaycall($this->request->post['developer_id'], $this->request->post['application_id'], $this->request->post['certification_id'], $this->request->post['compatability_level'], $this->request->post['site_id'], $call_name);
-
-			$xml = '<?xml version="1.0" encoding="utf-8"?>';
-			$xml .= '<ReviseInventoryStatusRequest xmlns="urn:ebay:apis:eBLBaseComponents">';
-			$xml .= '<WarningLevel>Low</WarningLevel>';
-  			$xml .= '<InventoryStatus>';
-    		$xml .= '<ItemID>' . $item_id . '</ItemID>';
-    		$xml .= '<Quantity>' . $quantity . '</Quantity>';
-  			$xml .= '</InventoryStatus>';
-			$xml .= '</ReviseInventoryStatusRequest>';
-
-			$xml_response = $ebay_call->sendHttpRequest($xml);
-
-	        if(stristr($xml_response, 'HTTP 404') || $xml_response == '') {
-		        $this->session->data['error'] = $this->language->get('error_ebay_api_call');
-		        $url = '';
-		        if (isset($this->request->get['page'])) {
-		          $url .= '&page=' . $this->request->get['page'];
-		        }
-		        $this->redirect($this->url->link('affiliate/stock_control', 'token=' . $this->session->data['token'] . $url, 'SSL'));
-	        }
-
-	        $doc_response = new DomDocument();
-	        $doc_response->loadXML($xml_response);
-	        $message = $doc_response->getElementsByTagName('Ack')->item(0)->nodeValue;
-	        
-	        if($message == 'Failure') {
-	        	$severity_code = $doc_response->getElementsByTagName('SeverityCode')->item(0)->nodeValue;
-	        	$error_code = $doc_response->getElementsByTagName('ErrorCode')->item(0)->nodeValue;
-	        	$short_message = $doc_response->getElementsByTagName('ShortMessage')->item(0)->nodeValue;
-	        	$long_message = $doc_response->getElementsByTagName('LongMessage')->item(0)->nodeValue;
-		        $this->session->data['error'] = strtoupper($severity_code) . ': ' . $long_message . ' Error Code: ' . $error_code;
-		        $url = '';
-		        if (isset($this->request->get['page'])) {
-		          $url .= '&page=' . $this->request->get['page'];
-		        }
-		        $this->redirect($this->url->link('affiliate/stock_control', 'token=' . $this->session->data['token'] . $url, 'SSL'));
-	        }
-
-	        
-		}
-	}
-
-	public function getItem($item_id) {
-		if ($this->request->server['REQUEST_METHOD'] == 'POST' && $this->validateEbayProfile() == 1) {
-			
-		}
 	}
 
     public function setEbayProfile() {

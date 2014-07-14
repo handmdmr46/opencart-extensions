@@ -304,26 +304,22 @@ class ModelCheckoutOrder extends Model {
 				############# STOCK CONTROL ################
 				############################################			
 				
-				/*$ebay_item_id = $this->getEbayItemId($order_product['product_id']);
+				$ebay_item_id = $this->getEbayItemId($order_product['product_id']);
 				$ebay_item_quantity = $this->getEbayItemQuantity($ebay_item_id);
-				$new_ebay_item_quantity = $ebay_item_quantity - $order_product['quantity'];*/
+				$new_ebay_item_quantity = $ebay_item_quantity - $order_product['quantity'];
 
 				$ebay_response = 'FAILED REQUEST - Please adjust your stock manually for this item';
 
 				// ebay item stock control
-				/*if(is_numeric($ebay_item_quantity) && $new_ebay_item_quantity < 1) {
+				if(is_numeric($ebay_item_quantity) && $new_ebay_item_quantity < 1) {
 					$ebay_response = 'EBAY ITEM ENDED - ItemID: ' . $ebay_item_id . ' - Response:';
 					$ebay_response .= $this->endEbayItem($ebay_item_id);
 				}
 
-				if(is_numeric($ebay_item_quantity) && $new_ebay_item_quantity > 1) {
+				if(is_numeric($ebay_item_quantity) && $new_ebay_item_quantity >= 1) {
 					$ebay_response = 'REVISED EBAY ITEM QUANTITY - ItemID: ' . $ebay_item_id . ' - Response: ';
 					$ebay_response .= $this->reviseEbayItemQuantity($ebay_item_id, $new_ebay_item_quantity);
-				}*/
-
-				// add eBay response to db
-				// $this->db->query("UPDATE " . DB_PREFIX . "order_product SET ebay_response = '" . $this->db->escape($ebay_response) . "' WHERE order_id = '" . (int)$order_id . "' AND product_id = '" . (int)$order_product['product_id'] . "'");				
-				
+				}
 
 				// adjust product quantity
 				$this->db->query("UPDATE " . DB_PREFIX . "product SET quantity = (quantity - " . (int)$order_product['quantity'] . ") WHERE product_id = '" . (int)$order_product['product_id'] . "' AND subtract = '1'");				
@@ -333,6 +329,9 @@ class ModelCheckoutOrder extends Model {
 					$this->db->query("UPDATE " . DB_PREFIX . "product SET status = '0' WHERE product_id = '" . (int)$order_product['product_id'] . "'");
 					$ebay_response .= ' - Opencart Product Status: Not Active (0) ';
 				}
+
+				// add eBay response to db
+				$this->db->query("UPDATE " . DB_PREFIX . "order_product SET ebay_response = '" . $this->db->escape($ebay_response) . "' WHERE order_id = '" . (int)$order_id . "' AND product_id = '" . (int)$order_product['product_id'] . "'");
 
 				// order options
 				$order_option_query = $this->db->query("SELECT * FROM " . DB_PREFIX . "order_option WHERE order_id = '" . (int)$order_id . "' AND order_product_id = '" . (int)$order_product['order_product_id'] . "'");				
@@ -804,7 +803,7 @@ class ModelCheckoutOrder extends Model {
 	}
 
 	public function reviseEbayItemQuantity($ebay_item_id, $new_quantity) {
-		$call_name = 'reviseInventoryStatus';
+		$call_name = 'ReviseInventoryStatus';
 		$profile = $this->getEbayProfile();		
 		$ebay_call = new Ebaycall($profile['developer_id'], $profile['application_id'], $profile['certification_id'], $profile['compat'], $profile['site_id'], $call_name);
 
@@ -843,7 +842,11 @@ class ModelCheckoutOrder extends Model {
         }
 
         if($message == 'Success') {
-        	$ebay_call_response = 'SUCCESS: Timestamp=';
+        	$ebay_call_response = 'SUCCESS: ItemID=';
+        	$ebay_call_response .= $doc_response->getElementsByTagName('ItemID')->item(0)->nodeValue;
+        	$ebay_call_response .= ' NewQuantity=';
+        	$ebay_call_response .= $doc_response->getElementsByTagName('Quantity')->item(0)->nodeValue;
+        	$ebay_call_response .= ' Timestamp=';
         	$ebay_call_response .= $doc_response->getElementsByTagName('Timestamp')->item(0)->nodeValue;
         }
 
